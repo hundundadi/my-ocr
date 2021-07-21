@@ -1,0 +1,33 @@
+--------------------------------------
+ChineseSimplified_10.png chi_sim
+2021-06-02 15:35:16:226035645
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+Detected 93 diacritics
+2021-06-02 15:35:25:334845777
+--------------------------------------
+ChineseTraditional_10.png chi_tra
+2021-06-02 15:35:25:335276583
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+Detected 108 diacritics
+2021-06-02 15:35:34:395041558
+--------------------------------------
+English_10.png eng
+2021-06-02 15:35:34:395837014
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+2021-06-02 15:35:38:883743537
+--------------------------------------
+ChineseSimplified_12.png chi_sim
+2021-06-02 15:35:38:884139359
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+2021-06-02 15:35:48:083441151
+--------------------------------------
+ChineseTraditional_12.png chi_tra
+2021-06-02 15:35:48:083990197
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+2021-06-02 15:35:57:087013526
+--------------------------------------
+English_12.png eng
+2021-06-02 15:35:57:087408862
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+2021-06-02 15:36:01:617894186
+--------------------------------------

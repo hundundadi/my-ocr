@@ -1,0 +1,22 @@
+--------------------------------------
+ChiSim_ChiTra_Eng.png chi_sim+chi_tra+eng
+2021-06-02 19:30:29:242326383
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+2021-06-02 19:30:50:521259925
+--------------------------------------
+ChiSim_ChiTra.png chi_sim+chi_tra
+2021-06-02 19:30:50:521832234
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+Detected 92 diacritics
+2021-06-02 19:31:08:348057505
+--------------------------------------
+ChiSim_Eng.png chi_sim+eng
+2021-06-02 19:31:08:348618935
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+2021-06-02 19:31:20:108880657
+--------------------------------------
+ChiTra_Eng.png chi_tra+eng
+2021-06-02 19:31:20:109299778
+Tesseract Open Source OCR Engine v5.0.0-alpha-20210401-98-g176d with Leptonica
+2021-06-02 19:31:31:612270863
+--------------------------------------
