@@ -60,6 +60,8 @@
 using namespace std;
 using namespace cv;
 
+enum adaptiveMethod{meanFilter,gaaussianFilter,medianFilter};
+
 /**
  * @brief The ImageProcess class 用来对图像进行一些预处理，处理完成之后再进行图像识别
  * Mat转IplImage
@@ -98,23 +100,18 @@ public:
      * @return false：处理失败  true：处理成功
      */
     bool mainProcess(QString &imagePath);
-    /**
-     * @brief CutPics  图像分割成100张小图分别进行自适应二值化，然后将100张图片重组为一张
-     * @param path  原图片路径
-     * @param fileTarget  保存的位置
-     * @return  分割重组后的图像
-     */
-    Mat CutPics(QString path, QString fileTarget);
 
     /**
-     * @brief ThinImage
-     * @param path 原图片路径
-     * @param fileTarget 保存的位置
+     * @brief ThresholdImage 局部二值化
+     * 原理：图像分割成100张小图分别进行自适应二值化，然后将100张图片重组为一张
+     * @param path
+     * @param fileTarget
      */
-    void ThinImage(const QString &path,const QString &fileTarget);
+    void ThresholdImage(QString path, QString fileTarget);
+
 
     /**
-     * @brief ThinImage1
+     * @brief ThinImage1 细化方法一
      * @param path
      * @param fileTarget
      */
@@ -122,28 +119,41 @@ public:
 
 
     /**
-     * @brief ThinImage1
+     * @brief ThinImage2 细化方法二
      * @param path
      * @param fileTarget
      */
     void ThinImage2(const QString &path,const QString &fileTarget);
 
+    /**
+     * @brief ThinImage3 细化方法三
+     * @param path 原图片路径
+     * @param fileTarget 保存的位置
+     */
+    void ThinImage3(const QString &path,const QString &fileTarget);
 
+    /**
+     * @brief DilationImage1
+     * @param path
+     * @param fileTarget
+     */
     void DilationImage1(const QString &path,const QString &fileTarget);
 
+    /**
+     * @brief ErosionImage1
+     * @param path
+     * @param fileTarget
+     */
+    void ErosionImage1(const QString &path,const QString &fileTarget);
 
 //    bool mainProcessImage(QString &imagePath);
 
 private:
 
-    /*************************图像二值化*************************/
-    /**
-     * @brief thresholdImage  图像二值化
-     * @param srcImage
-     * @param dstImage_out
-     */
-    void thresholdImage(IplImage *srcImage,IplImage *dstImage_out);
-    /********************************************************/
+    void AdaptiveThreshold(cv::Mat& src, cv::Mat& dst, double Maxval, int Subsize, double c, adaptiveMethod method = meanFilter);
+
+
+    void AdaptiveThereshold(Mat &src,Mat &dst);
 
     /*************************图像细化*************************/
     /**
@@ -162,12 +172,12 @@ private:
     cv::Mat ThinImage2_sub(const cv::Mat & src, const int maxIterations = -1);
 
     /**
-     * @brief ThinImage  图像细化处理 方法三 （ThinImage、ThinSubiteration1、ThinSubiteration2）
+     * @brief ThinImage3  图像细化处理 方法三 （ThinImage、ThinSubiteration1、ThinSubiteration2）
      * @param inputImage
      * @return
      */
-    void ThinImage_sub1(Mat & pSrc, Mat & pDst);
-    void ThinImage_sub2(Mat & pSrc, Mat & pDst);
+    void ThinImage3_sub1(Mat & pSrc, Mat & pDst);
+    void ThinImage3_sub2(Mat & pSrc, Mat & pDst);
 
     /**
      * @brief gThin 图像细化方法四
@@ -188,13 +198,15 @@ private:
     //膨胀
     void DilationImage1_sub1(Mat &src,Mat &dst_diolate,int dilation_size);
     //腐蚀
-    void DilationImage1_sub2(Mat &src,Mat &dst_erosion,int erosion_size);
+    void ErosionImage1_sub1(Mat &src,Mat &dst_erosion,int erosion_size);
 
     /********************************************************/
 
     /*************************图像分割*************************/
     vector<Mat> cutPics( IplImage *img);
     /********************************************************/
+
+
 
     /**
      * @brief QImageToIplImage QImage转换成IplImage
@@ -211,7 +223,7 @@ private:
     QImage *IplImageToQImage( IplImage *img);
 
 
-
+    void merageImages(vector<Mat> images,Mat &dst,int cut_rows,int cut_cols);
     //传入一个整数获取对应的opencv中的图像类型
     QString getImgType(int imgTypeInt);
 

@@ -50,14 +50,13 @@ void ImageProcess::setPath(QString &path)
 
 bool ImageProcess::mainProcess(QString &imagePath)
 {
-    qDebug() << __func__ ;
+    qDebug() << "start: " << __func__ ;
     clock_t start,finish;
     double totaltime;
     //开始时间
     start=clock();
     //opencv加载图片
     qDebug() << "opencv 加载图片 ";
-
     IplImage *pSrc = cvLoadImage(imagePath.toLocal8Bit().data(),CV_LOAD_IMAGE_GRAYSCALE);
     if(!pSrc)
     {
@@ -74,24 +73,26 @@ bool ImageProcess::mainProcess(QString &imagePath)
     //medianBlur(cvarrToMat(pDst), cvarrToMat(pDst), 3);
     //cvSaveImage((m_path+"/medianBlur_result.png").toLocal8Bit().data(),pDst);
 
-    cvThreshold(pSrc,pDst,245,255, THRESH_BINARY_INV);
-//    cvThreshold(pSrc,pDst,1,255, THRESH_OTSU);
-//    cvThreshold(pSrc,pDst,128,128, THRESH_BINARY);
+    cvThreshold(pSrc,pDst,245,255, THRESH_OTSU);
+    //cvThreshold(pSrc,pDst,220,255, THRESH_BINARY_INV);
+//    imshow("pDst", cvarrToMat(pDst));
+//    waitKey(0);
+    //    cvThreshold(pSrc,pDst,1,255, THRESH_OTSU);
+    //    cvThreshold(pSrc,pDst,128,128, THRESH_BINARY);
     cvSaveImage((m_path+"/threshold_result.png").toLocal8Bit().data(),pDst);
-
     //双边带滤波
     //bilateralFilter(cvarrToMat(pDst), cvarrToMat(pDst),3,3,3);
     //cvSaveImage((m_path+"/bilateralFilter_result.png").toLocal8Bit().data(),pDst);
     //图像细化
     qDebug() << "图像细化 ";
-//    IplImage imgTmp = IplImage(thinImage(cvarrToMat(pTemp)));
-//    pDst = cvCloneImage(&imgTmp);
-//    Mat inputImage = cvarrToMat(pTemp);
-//    Mat outputImage;
-//    thinImage(inputImage,outputImage);
-//    //inputImage.convertTo(inputImage, CV_32FC1);
-//    IplImage imgTmp = IplImage(outputImage);
-//    pDst = cvCloneImage(&imgTmp);
+    //    IplImage imgTmp = IplImage(thinImage(cvarrToMat(pTemp)));
+    //    pDst = cvCloneImage(&imgTmp);
+    //    Mat inputImage = cvarrToMat(pTemp);
+    //    Mat outputImage;
+    //    thinImage(inputImage,outputImage);
+    //    //inputImage.convertTo(inputImage, CV_32FC1);
+    //    IplImage imgTmp = IplImage(outputImage);
+    //    pDst = cvCloneImage(&imgTmp);
 
     //thinImage(pTemp,pDst);
     for (int i=0; i<pDst->height; ++i)
@@ -113,53 +114,384 @@ bool ImageProcess::mainProcess(QString &imagePath)
     qDebug() << "图像扩展 ";
     dilateImage(d1);
 
-//    IplImage *ms=cvLoadImage((m_path+"/Img_dilate.jpg").toLocal8Bit().data(),0);
-//    IplImage *pa = cvCreateImage(cvGetSize(ms),ms->depth,ms->nChannels);
-//    IplImage *pb = cvCreateImage(cvGetSize(ms),ms->depth,ms->nChannels);
+    //    IplImage *ms=cvLoadImage((m_path+"/Img_dilate.jpg").toLocal8Bit().data(),0);
+    //    IplImage *pa = cvCreateImage(cvGetSize(ms),ms->depth,ms->nChannels);
+    //    IplImage *pb = cvCreateImage(cvGetSize(ms),ms->depth,ms->nChannels);
 
-//    //图像二值化
-//    qDebug() << "图片二值化 ";
-//    cvThreshold(ms,pa,128,1,CV_THRESH_BINARY);
-//    cvSaveImage((m_path+"/threshold_again.jpg").toLocal8Bit().data(),pTemp);
-//    //图像细化
-//    qDebug() << "图像细化 ";
-//    thinImage(pa,pb);
-//    for (int i=0; i<pb->height; ++i)
-//    {
-//        for (int j=0; j<pb->width; ++j)
-//        {
-//            if(CV_IMAGE_ELEM(pb,uchar,i,j)==1)
-//                CV_IMAGE_ELEM(pb,uchar,i,j)= 255;
-//        }
-//    }
-//    cvSaveImage((m_path+"/thin_again.jpg").toLocal8Bit().data(),pb);
+    //    //图像二值化
+    //    qDebug() << "图片二值化 ";
+    //    cvThreshold(ms,pa,128,1,CV_THRESH_BINARY);
+    //    cvSaveImage((m_path+"/threshold_again.jpg").toLocal8Bit().data(),pTemp);
+    //    //图像细化
+    //    qDebug() << "图像细化 ";
+    //    thinImage(pa,pb);
+    //    for (int i=0; i<pb->height; ++i)
+    //    {
+    //        for (int j=0; j<pb->width; ++j)
+    //        {
+    //            if(CV_IMAGE_ELEM(pb,uchar,i,j)==1)
+    //                CV_IMAGE_ELEM(pb,uchar,i,j)= 255;
+    //        }
+    //    }
+    //    cvSaveImage((m_path+"/thin_again.jpg").toLocal8Bit().data(),pb);
 
-//    IplImage *d2=cvLoadImage((m_path+"/thin_again.jpg").toLocal8Bit().data(),0);
-//    qDebug() << "图像扩展 ";
-//    dilateImage(d2);
+    //    IplImage *d2=cvLoadImage((m_path+"/thin_again.jpg").toLocal8Bit().data(),0);
+    //    qDebug() << "图像扩展 ";
+    //    dilateImage(d2);
 
 
     finish=clock();
     totaltime=(double)(finish-start)/CLOCKS_PER_SEC;
 
-    qDebug()<<"Total time:"<<totaltime<<endl;
+    qDebug()<<"Total time:"<<totaltime;
     cvReleaseImage(&pSrc);
     cvReleaseImage(&pTemp);
     cvReleaseImage(&pDst);
-//    cvReleaseImage(&d1);
-//    cvReleaseImage(&ms);
-//    cvReleaseImage(&pa);
-//    cvReleaseImage(&pb);
-//    cvReleaseImage(&d2);
+    //    cvReleaseImage(&d1);
+    //    cvReleaseImage(&ms);
+    //    cvReleaseImage(&pa);
+    //    cvReleaseImage(&pb);
+    //    cvReleaseImage(&d2);
 
     //cvWaitKey();
+    qDebug() << "end: " << __func__ ;
+
+}
+void ImageProcess::ThresholdImage(QString path, QString fileTarget)
+{
+    qDebug() << "start: " << __func__;
+    //分割图片
+    int cut_rows = 10, cut_cols = 10; //将一张图片切割为10*10小图片
+    Mat srcImg = imread(path.toLocal8Bit().data());
+    vector<Mat> ceilImg;
+    int height = srcImg.rows;
+    int width = srcImg.cols;
+    int ceil_height = (int)(height / cut_rows);
+    int ceil_width = (int)(width / cut_cols);
+    int ceil_down_height = height - (cut_rows - 1)*ceil_height;
+    int ceil_right_width = width - (cut_cols - 1)*ceil_width;
+    for (int i = 0; i<cut_rows - 1; i++)
+        for (int j = 0; j<cut_cols; j++)
+        {
+            if (j<cut_cols - 1)
+            {
+                Rect rect(j*ceil_width, i*ceil_height, ceil_width, ceil_height);
+                ceilImg.push_back(srcImg(rect));
+            }
+            else
+            {
+                Rect rect((cut_cols - 1)*ceil_width, i*ceil_height, ceil_right_width, ceil_height);
+                ceilImg.push_back(srcImg(rect));
+            }
+        }
+    for (int i = 0; i<cut_cols; i++)
+    {
+        if (i<cut_cols - 1)
+        {
+            Rect rect(i*ceil_width, (cut_rows - 1)*ceil_height, ceil_width, ceil_down_height);
+            ceilImg.push_back(srcImg(rect));
+        }
+        else   //右下角这个图像块
+        {
+            Rect rect((cut_cols - 1)*ceil_width, (cut_rows - 1)*ceil_height, ceil_right_width, ceil_down_height);
+            ceilImg.push_back(srcImg(rect));
+        }
+    }
+
+    Mat dst,dst3,dst5,dst7,dst9,dst11,temp;
+    vector<Mat> images,images3,images5,images7,images9,images11;
+
+    //对每张小图片进行滤波，二值化处理
+    for (int i = 0; i < ceilImg.size(); i++)
+    {
+        cvtColor(ceilImg[i], dst, COLOR_BGR2GRAY);
+        //dst = ceilImg[i];
+        //高斯滤波
+        //GaussianBlur(dst,dst, Size(3,3), 0);
+        //GaussianBlur(dst,dst, Size(7,7), 0);
+        //GaussianBlur(dst,dst, Size(5,5), 0);
+
+        //中值滤波
+        //medianBlur(dst, dst, 3);
+        //medianBlur(dst, dst, 5); //效果不理想
+        //medianBlur(dst, dst, 7);//效果不理想
+
+        //双边带滤波不适用于单通道图像即二值化图像
+        //bilateralFilter(dst,dst,3,3,3);
+
+        //非opencv自适应二值化
+        //AdaptiveThreshold(dst, dst, 255, 21, 10, meanFilter);  //效果不理想
+        //OTSU阈值分割较自适应阈值分割效果更差
+        threshold(dst,dst,245,255,THRESH_OTSU);
+        //         double t =threshold(dst,dst3,0,255,THRESH_OTSU);
+//         qDebug() <<  " t >> " << i << " : " << t;
+//         if(i == 36 ){
+//             t =threshold(dst,dst,245,255,THRESH_BINARY);
+//         }
+//         else if(i == 46){
+//             t =threshold(dst,dst,230,255,THRESH_BINARY);
+//         }
+//         else{
+//             if(t >= 240){
+//                 t =threshold(dst,dst,250,255,THRESH_BINARY);
+//             }
+//             else if(t < 240 && t >= 200){
+//                 t =threshold(dst,dst,240,255,THRESH_BINARY);
+//             }
+//             else if(t < 200 && t >= 180){
+//                 t =threshold(dst,dst,t+45,255,THRESH_BINARY);
+//             }
+//             else if(t < 180 && t >= 160){
+//                 t =threshold(dst,dst,t+40,255,THRESH_BINARY);
+//             }
+//             else if(t < 160 && t >= 140){
+//                 t =threshold(dst,dst,t+50,255,THRESH_BINARY);
+//             }
+//             else if(t < 140 && t >= 120){
+//                 t =threshold(dst,dst,t+60,255,THRESH_BINARY);
+//             }
+//             else {
+//                 threshold(dst,dst,245,255,THRESH_OTSU);
+//             }
+//         }
+
+
+//         else if(t < 120 && t >= 100){
+//             t =threshold(dst,dst,120,255,THRESH_BINARY);
+//         }
+//         else if(t < 80){
+//             threshold(dst,dst,40,255,THRESH_BINARY);
+//         }
+
+         //threshold(dst,dst5,127,255,THRESH_OTSU);
+        //threshold(dst,dst7,127,255,THRESH_OTSU);
+        //threshold(dst,dst9,127,255,THRESH_OTSU);
+        //threshold(dst,dst11,127,255,THRESH_OTSU);
+//        if(i%2 == 0 && i < 10 ){
+//            t =threshold(dst,dst,0,255, THRESH_BINARY);
+//        }
+//        else if(i%2 != 0 && i < 10 ){
+//            t =threshold(dst,dst,255,255, THRESH_BINARY);
+//        }
+//        qDebug() <<  " t >> " << i << " : " << t;
+
+
+        //opencv自适应阈值分割
+        adaptiveThreshold(dst,dst3,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,3,5);
+        adaptiveThreshold(dst,dst5,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY_INV,5,1);
+        adaptiveThreshold(dst,dst7,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY_INV,7,1);//效果相对来说最好
+        adaptiveThreshold(dst,dst9,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,9,2);
+        adaptiveThreshold(dst,dst11,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,15, 2);
+//        adaptiveThreshold(dst,dst,255,ADAPTIVE_THRESH_GAUSSIAN_C,THRESH_BINARY,11,2);
+
+        //非opencv自适应方法
+        //AdaptiveThereshold(dst,dst);
+
+        //高斯滤波放在此处效果不理想
+//                GaussianBlur(dst,dst, Size(3,3), 0);
+        //        GaussianBlur(dst3,dst3, Size(3,3), 0);
+        //        GaussianBlur(dst5,dst5, Size(3,3), 0);
+        //        GaussianBlur(dst7,dst7, Size(3,3), 0);
+        //        GaussianBlur(dst9,dst9, Size(3,3), 0);
+        //        GaussianBlur(dst11,dst11, Size(3,3), 0);
+        //中值滤波放在此处效果不理想
+        //        medianBlur(dst, dst, 3);
+        //        medianBlur(dst3, dst3,  3);
+        //medianBlur(dst5, dst5,  5);
+        //        medianBlur(dst7, dst7,  3);
+        //        medianBlur(dst9, dst9,  3);
+        //        medianBlur(dst11, dst11, 3);
+
+        images.push_back(dst.clone());
+        images3.push_back(dst3.clone());
+        images5.push_back(dst5.clone());
+        images7.push_back(dst7.clone());
+        images9.push_back(dst9.clone());
+        images11.push_back(dst11.clone());
+    }
+
+    Mat bigImage,bigImage3,bigImage5,bigImage7,bigImage9,bigImage11;
+    //将这些小图片重新合成一张大图
+    merageImages(images,bigImage,cut_rows,cut_cols);
+    merageImages(images3,bigImage3,cut_rows,cut_cols);
+    merageImages(images5,bigImage5,cut_rows,cut_cols);
+    merageImages(images7,bigImage7,cut_rows,cut_cols);
+    merageImages(images9,bigImage9,cut_rows,cut_cols);
+    merageImages(images11,bigImage11,cut_rows,cut_cols);
+//    imshow("bigImage", bigImage);
+//    imshow("bigImage3", bigImage3);
+//    imshow("bigImage5", bigImage5);
+//    imshow("bigImage7", bigImage7);
+//    imshow("bigImage9", bigImage9);
+//    imshow("bigImage11", bigImage11);
+//    waitKey(0);
+    //GaussianBlur(bigImage,bigImage, Size(3,3), 0);高斯滤波放在此处效果不理想
+    threshold(bigImage,bigImage,1,255,THRESH_BINARY);
+    //imshow("ThresholdImage", bigImage);
+    //waitKey(0);
+    imwrite(fileTarget.toLocal8Bit().data(), bigImage);
+    qDebug() << "end: " << __func__;
 
 }
 
 
-void ImageProcess::thresholdImage(IplImage *srcImage,IplImage *dstImage_out)
+void ImageProcess::ThinImage1(const QString &path, const QString &fileTarget)
 {
+    qDebug() << "start: " << __func__;
+    cv::Mat src = imread(path.toLocal8Bit().data());
+    cvtColor(src,src,COLOR_BGR2GRAY);
+    threshold(src,src,100,255,THRESH_BINARY);
+    Mat dst;
+    ThinImage1_sub(src,dst,12);
+    //imshow("ThinImage1",dst);
+    //waitKey(0);
+    imwrite(fileTarget.toLocal8Bit().data(), dst);
+    qDebug() << "end: " << __func__;
 
+}
+
+void ImageProcess::ThinImage2(const QString &path, const QString &fileTarget)
+{
+    qDebug() << "start: " << __func__;
+    //获取图像
+    cv::Mat src = cv::imread(path.toLocal8Bit().data(), cv::IMREAD_GRAYSCALE);
+    if (src.empty())
+    {
+        std::cout << "读取文件失败！" << std::endl;
+        return;
+    }
+    //将原图像转换为二值图像
+    cv::threshold(src, src, 128, 1, cv::THRESH_BINARY);
+    //图像细化
+    cv::Mat dst = ThinImage2_sub(src);
+    //显示图像
+    dst = dst * 255;
+    //cv::namedWindow("src1", CV_WINDOW_AUTOSIZE);
+    //cv::namedWindow("dst1", CV_WINDOW_AUTOSIZE);
+    //cv::imshow("src1", src);
+    //cv::imshow("ThinImage2", dst);
+    //cv::waitKey(0);
+    imwrite(fileTarget.toLocal8Bit().data(), dst);
+    qDebug() << "end: " << __func__;
+
+}
+
+//此细化方法效果不理想
+void ImageProcess::ThinImage3(const QString &path, const QString &fileTarget)
+{
+    qDebug() << "start: " << __func__;
+    Mat inputarray = imread(path.toLocal8Bit().data());
+    //imshow("inputarray1", inputarray);
+    //waitKey(0);
+    //inputarray = inputarray(Rect(10, 10, inputarray.cols - 20, inputarray.rows - 20));
+    threshold(inputarray, inputarray, 100, 255, CV_THRESH_BINARY);
+    //imshow("inputarray2", inputarray);
+    //waitKey(0);
+    //qDebug() << "theType1: " << getImgType(inputarray.type());
+    Mat outputarray(inputarray.rows,inputarray.cols,CV_32FC1);
+
+    bool bDone = false;
+    int rows = inputarray.rows;
+    int cols = inputarray.cols;
+
+    inputarray.convertTo(inputarray, CV_32FC1);
+    inputarray.copyTo(outputarray);
+    //qDebug() << "theType2: " << getImgType(inputarray.type());
+    //imshow("inputarray3", inputarray);
+    //waitKey(0);
+    //outputarray.convertTo(outputarray, CV_32FC1);
+
+    /// pad source
+    Mat p_enlarged_src = Mat(rows + 2, cols + 2, CV_32FC1);
+    for (int i = 0; i < (rows + 2); i++) {
+        p_enlarged_src.at<float>(i, 0) = 0.0f;
+        p_enlarged_src.at<float>(i, cols + 1) = 0.0f;
+    }
+    for (int j = 0; j < (cols + 2); j++) {
+        p_enlarged_src.at<float>(0, j) = 0.0f;
+        p_enlarged_src.at<float>(rows + 1, j) = 0.0f;
+    }
+    //imshow("p_enlarged_src1", p_enlarged_src);
+    //waitKey(0);
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (inputarray.at<float>(i, j) >= 20.0f) {
+                p_enlarged_src.at<float>(i + 1, j + 1) = 1.0f;
+            }
+            else{
+                p_enlarged_src.at<float>(i + 1, j + 1) = 0.0f;
+            }
+        }
+    }
+    //imshow("p_enlarged_src2", p_enlarged_src);
+    //waitKey(0);
+    /// start to thin
+    Mat p_thinMat1 = Mat::zeros(rows + 2, cols + 2, CV_32FC1);
+    Mat p_thinMat2 = Mat::zeros(rows + 2, cols + 2, CV_32FC1);
+    Mat p_cmp = Mat::zeros(rows + 2, cols + 2, CV_8UC1);
+
+    while (bDone != true) {
+        /// sub-iteration 1
+        ThinImage3_sub1(p_enlarged_src, p_thinMat1);
+        /// sub-iteration 2
+        //ThinImage3_sub2(p_thinMat1, p_thinMat2);
+        /// compare
+        compare(p_enlarged_src, p_thinMat1, p_cmp, CV_CMP_EQ);
+        /// check
+        int num_non_zero = countNonZero(p_cmp);
+        if (num_non_zero == (rows + 2) * (cols + 2)) {
+            bDone = true;
+        }
+        /// copy
+        p_thinMat1.copyTo(p_enlarged_src);
+    }
+    //imshow("p_thinMat1", p_thinMat1);
+    //imshow("p_cmp", p_cmp);
+    //imshow("p_enlarged_src3", p_enlarged_src);
+    //waitKey(0);
+    // copy result
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            outputarray.at<float>(i, j) = p_enlarged_src.at<float>(i + 1, j + 1);
+        }
+    }
+    //imshow("inputarray4", inputarray);
+    //imshow("p_enlarged_src4", p_enlarged_src);
+    //imshow("ThinImage", outputarray);
+    //imshow("ThinImage", outputarray);
+    //waitKey(0);
+    imwrite(fileTarget.toLocal8Bit().data(), outputarray);
+    qDebug() << "end: " << __func__;
+
+}
+
+void ImageProcess::DilationImage1(const QString &path, const QString &fileTarget)
+{
+    qDebug() << "start: " << __func__;
+    Mat src, dst_diolate;
+    int dilation_size = 1;
+    src = imread(path.toLocal8Bit().data());
+
+    //膨胀
+    DilationImage1_sub1(src,dst_diolate,dilation_size);
+    //imshow("dst_diolate", dst_diolate);
+    //waitKey(0);
+    imwrite(fileTarget.toLocal8Bit().data(), dst_diolate);
+    qDebug() << "end: " << __func__;
+}
+
+void ImageProcess::ErosionImage1(const QString &path, const QString &fileTarget)
+{
+    qDebug() << "start: " << __func__;
+    Mat src, dst_erosion;
+    int erosion_size = 1;
+    src = imread(path.toLocal8Bit().data());
+    //腐蚀
+    ErosionImage1_sub1(src,dst_erosion,erosion_size);
+    //imshow("dst_erosion", dst_erosion);
+    //waitKey(0);
+    imwrite(fileTarget.toLocal8Bit().data(), dst_erosion);
+    qDebug() << "end: " << __func__;
 }
 
 bool ImageProcess::thinImage(IplImage *srcImage, IplImage *dstImage_out)
@@ -301,229 +633,6 @@ bool ImageProcess::thinImage(IplImage *srcImage, IplImage *dstImage_out)
         else
         {
             mFlag.clear();//将mFlag清空
-        }
-    }
-}
-
-Mat ImageProcess::ThinImage2_sub(const Mat &src, const int maxIterations)
-{
-    assert(src.type() == CV_8UC1);
-    cv::Mat dst;
-    int width  = src.cols;
-    int height = src.rows;
-    src.copyTo(dst);
-    int count = 0;  //记录迭代次数
-    while (true)
-    {
-        count++;
-        if (maxIterations != -1 && count > maxIterations) //限制次数并且迭代次数到达
-            break;
-        std::vector<uchar *> mFlag; //用于标记需要删除的点
-        //对点标记
-        for (int i = 0; i < height ;++i)
-        {
-            uchar * p = dst.ptr<uchar>(i);
-            for (int j = 0; j < width; ++j)
-            {
-                //如果满足四个条件，进行标记
-                //  p9 p2 p3
-                //  p8 p1 p4
-                //  p7 p6 p5
-                uchar p1 = p[j];
-                if (p1 != 1) continue;
-                uchar p4 = (j == width - 1) ? 0 : *(p + j + 1);
-                uchar p8 = (j == 0) ? 0 : *(p + j - 1);
-                uchar p2 = (i == 0) ? 0 : *(p - dst.step + j);
-                uchar p3 = (i == 0 || j == width - 1) ? 0 : *(p - dst.step + j + 1);
-                uchar p9 = (i == 0 || j == 0) ? 0 : *(p - dst.step + j - 1);
-                uchar p6 = (i == height - 1) ? 0 : *(p + dst.step + j);
-                uchar p5 = (i == height - 1 || j == width - 1) ? 0 : *(p + dst.step + j + 1);
-                uchar p7 = (i == height - 1 || j == 0) ? 0 : *(p + dst.step + j - 1);
-                if ((p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) >= 2 && (p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) <= 6)
-                {
-                    int ap = 0;
-                    if (p2 == 0 && p3 == 1) ++ap;
-                    if (p3 == 0 && p4 == 1) ++ap;
-                    if (p4 == 0 && p5 == 1) ++ap;
-                    if (p5 == 0 && p6 == 1) ++ap;
-                    if (p6 == 0 && p7 == 1) ++ap;
-                    if (p7 == 0 && p8 == 1) ++ap;
-                    if (p8 == 0 && p9 == 1) ++ap;
-                    if (p9 == 0 && p2 == 1) ++ap;
-
-                    if (ap == 1 && p2 * p4 * p6 == 0 && p4 * p6 * p8 == 0)
-                    {
-                        //标记
-                        mFlag.push_back(p+j);
-                    }
-                }
-            }
-        }
-
-        //将标记的点删除
-        for (std::vector<uchar *>::iterator i = mFlag.begin(); i != mFlag.end(); ++i)
-        {
-            **i = 0;
-        }
-
-        //直到没有点满足，算法结束
-        if (mFlag.empty())
-        {
-            break;
-        }
-        else
-        {
-            mFlag.clear();//将mFlag清空
-        }
-
-        //对点标记
-        for (int i = 0; i < height; ++i)
-        {
-            uchar * p = dst.ptr<uchar>(i);
-            for (int j = 0; j < width; ++j)
-            {
-                //如果满足四个条件，进行标记
-                //  p9 p2 p3
-                //  p8 p1 p4
-                //  p7 p6 p5
-                uchar p1 = p[j];
-                if (p1 != 1) continue;
-                uchar p4 = (j == width - 1) ? 0 : *(p + j + 1);
-                uchar p8 = (j == 0) ? 0 : *(p + j - 1);
-                uchar p2 = (i == 0) ? 0 : *(p - dst.step + j);
-                uchar p3 = (i == 0 || j == width - 1) ? 0 : *(p - dst.step + j + 1);
-                uchar p9 = (i == 0 || j == 0) ? 0 : *(p - dst.step + j - 1);
-                uchar p6 = (i == height - 1) ? 0 : *(p + dst.step + j);
-                uchar p5 = (i == height - 1 || j == width - 1) ? 0 : *(p + dst.step + j + 1);
-                uchar p7 = (i == height - 1 || j == 0) ? 0 : *(p + dst.step + j - 1);
-
-                if ((p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) >= 2 && (p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) <= 6)
-                {
-                    int ap = 0;
-                    if (p2 == 0 && p3 == 1) ++ap;
-                    if (p3 == 0 && p4 == 1) ++ap;
-                    if (p4 == 0 && p5 == 1) ++ap;
-                    if (p5 == 0 && p6 == 1) ++ap;
-                    if (p6 == 0 && p7 == 1) ++ap;
-                    if (p7 == 0 && p8 == 1) ++ap;
-                    if (p8 == 0 && p9 == 1) ++ap;
-                    if (p9 == 0 && p2 == 1) ++ap;
-
-                    if (ap == 1 && p2 * p4 * p8 == 0 && p2 * p6 * p8 == 0)
-                    {
-                        //标记
-                        mFlag.push_back(p+j);
-                    }
-                }
-            }
-        }
-
-        //将标记的点删除
-        for (std::vector<uchar *>::iterator i = mFlag.begin(); i != mFlag.end(); ++i)
-        {
-            **i = 0;
-        }
-
-        //直到没有点满足，算法结束
-        if (mFlag.empty())
-        {
-            break;
-        }
-        else
-        {
-            mFlag.clear();//将mFlag清空
-        }
-    }
-    return dst;
-}
-
-void ImageProcess::ThinImage_sub1(Mat &pSrc, Mat &pDst)
-{
-    int rows = pSrc.rows;
-    int cols = pSrc.cols;
-    pSrc.copyTo(pDst);
-    for(int i = 0; i < rows; i++) {
-        for(int j = 0; j < cols; j++) {
-            if(pSrc.at<float>(i, j) == 1.0f) {
-                /// get 8 neighbors
-                /// calculate C(p)
-                int neighbor0 = (int) pSrc.at<float>( i-1, j-1);
-                int neighbor1 = (int) pSrc.at<float>( i-1, j);
-                int neighbor2 = (int) pSrc.at<float>( i-1, j+1);
-                int neighbor3 = (int) pSrc.at<float>( i, j+1);
-                int neighbor4 = (int) pSrc.at<float>( i+1, j+1);
-                int neighbor5 = (int) pSrc.at<float>( i+1, j);
-                int neighbor6 = (int) pSrc.at<float>( i+1, j-1);
-                int neighbor7 = (int) pSrc.at<float>( i, j-1);
-                int C = int(~neighbor1 & ( neighbor2 | neighbor3)) +
-                        int(~neighbor3 & ( neighbor4 | neighbor5)) +
-                        int(~neighbor5 & ( neighbor6 | neighbor7)) +
-                        int(~neighbor7 & ( neighbor0 | neighbor1));
-                if(C == 1) {
-                    /// calculate N
-                    int N1 = int(neighbor0 | neighbor1) +
-                            int(neighbor2 | neighbor3) +
-                            int(neighbor4 | neighbor5) +
-                            int(neighbor6 | neighbor7);
-                    int N2 = int(neighbor1 | neighbor2) +
-                            int(neighbor3 | neighbor4) +
-                            int(neighbor5 | neighbor6) +
-                            int(neighbor7 | neighbor0);
-                    int N = min(N1,N2);
-                    if ((N == 2) || (N == 3)) {
-                        /// calculate criteria 3
-                        int c3 = ( neighbor1 | neighbor2 | ~neighbor4) & neighbor3;
-                        if(c3 == 0) {
-                            pDst.at<float>( i, j) = 0.0f;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void ImageProcess::ThinImage_sub2(Mat &pSrc, Mat &pDst)
-{
-    int rows = pSrc.rows;
-    int cols = pSrc.cols;
-    pSrc.copyTo( pDst);
-    for(int i = 0; i < rows; i++) {
-        for(int j = 0; j < cols; j++) {
-            if (pSrc.at<float>( i, j) == 1.0f) {
-                /// get 8 neighbors
-                /// calculate C(p)
-                int neighbor0 = (int) pSrc.at<float>( i-1, j-1);
-                int neighbor1 = (int) pSrc.at<float>( i-1, j);
-                int neighbor2 = (int) pSrc.at<float>( i-1, j+1);
-                int neighbor3 = (int) pSrc.at<float>( i, j+1);
-                int neighbor4 = (int) pSrc.at<float>( i+1, j+1);
-                int neighbor5 = (int) pSrc.at<float>( i+1, j);
-                int neighbor6 = (int) pSrc.at<float>( i+1, j-1);
-                int neighbor7 = (int) pSrc.at<float>( i, j-1);
-                int C = int(~neighbor1 & ( neighbor2 | neighbor3)) +
-                        int(~neighbor3 & ( neighbor4 | neighbor5)) +
-                        int(~neighbor5 & ( neighbor6 | neighbor7)) +
-                        int(~neighbor7 & ( neighbor0 | neighbor1));
-                if(C == 1) {
-                    /// calculate N
-                    int N1 = int(neighbor0 | neighbor1) +
-                            int(neighbor2 | neighbor3) +
-                            int(neighbor4 | neighbor5) +
-                            int(neighbor6 | neighbor7);
-                    int N2 = int(neighbor1 | neighbor2) +
-                            int(neighbor3 | neighbor4) +
-                            int(neighbor5 | neighbor6) +
-                            int(neighbor7 | neighbor0);
-                    int N = min(N1,N2);
-                    if((N == 2) || (N == 3)) {
-                        int E = (neighbor5 | neighbor6 | ~neighbor0) & neighbor7;
-                        if(E == 0) {
-                            pDst.at<float>(i, j) = 0.0f;
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -694,38 +803,229 @@ void ImageProcess::ThinImage1_sub(Mat &src, Mat &dst, int intera)
     }
     //imshow("thin",dst);
 }
-/*
-bool ImageProcess::dilateImage(IplImage *srcImage)
+
+Mat ImageProcess::ThinImage2_sub(const Mat &src, const int maxIterations)
 {
-    IplImage *m1;
-    m1 = srcImage;
-
-    if(m1 == NULL)
+    assert(src.type() == CV_8UC1);
+    cv::Mat dst;
+    int width  = src.cols;
+    int height = src.rows;
+    src.copyTo(dst);
+    int count = 0;  //记录迭代次数
+    while (true)
     {
-        qDebug() << "图片膨胀失败";
-        return false;
+        count++;
+        if (maxIterations != -1 && count > maxIterations) //限制次数并且迭代次数到达
+            break;
+        std::vector<uchar *> mFlag; //用于标记需要删除的点
+        //对点标记
+        for (int i = 0; i < height ;++i)
+        {
+            uchar * p = dst.ptr<uchar>(i);
+            for (int j = 0; j < width; ++j)
+            {
+                //如果满足四个条件，进行标记
+                //  p9 p2 p3
+                //  p8 p1 p4
+                //  p7 p6 p5
+                uchar p1 = p[j];
+                if (p1 != 1) continue;
+                uchar p4 = (j == width - 1) ? 0 : *(p + j + 1);
+                uchar p8 = (j == 0) ? 0 : *(p + j - 1);
+                uchar p2 = (i == 0) ? 0 : *(p - dst.step + j);
+                uchar p3 = (i == 0 || j == width - 1) ? 0 : *(p - dst.step + j + 1);
+                uchar p9 = (i == 0 || j == 0) ? 0 : *(p - dst.step + j - 1);
+                uchar p6 = (i == height - 1) ? 0 : *(p + dst.step + j);
+                uchar p5 = (i == height - 1 || j == width - 1) ? 0 : *(p + dst.step + j + 1);
+                uchar p7 = (i == height - 1 || j == 0) ? 0 : *(p + dst.step + j - 1);
+                if ((p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) >= 2 && (p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) <= 6)
+                {
+                    int ap = 0;
+                    if (p2 == 0 && p3 == 1) ++ap;
+                    if (p3 == 0 && p4 == 1) ++ap;
+                    if (p4 == 0 && p5 == 1) ++ap;
+                    if (p5 == 0 && p6 == 1) ++ap;
+                    if (p6 == 0 && p7 == 1) ++ap;
+                    if (p7 == 0 && p8 == 1) ++ap;
+                    if (p8 == 0 && p9 == 1) ++ap;
+                    if (p9 == 0 && p2 == 1) ++ap;
+
+                    if (ap == 1 && p2 * p4 * p6 == 0 && p4 * p6 * p8 == 0)
+                    {
+                        //标记
+                        mFlag.push_back(p+j);
+                    }
+                }
+            }
+        }
+
+        //将标记的点删除
+        for (std::vector<uchar *>::iterator i = mFlag.begin(); i != mFlag.end(); ++i)
+        {
+            **i = 0;
+        }
+
+        //直到没有点满足，算法结束
+        if (mFlag.empty())
+        {
+            break;
+        }
+        else
+        {
+            mFlag.clear();//将mFlag清空
+        }
+
+        //对点标记
+        for (int i = 0; i < height; ++i)
+        {
+            uchar * p = dst.ptr<uchar>(i);
+            for (int j = 0; j < width; ++j)
+            {
+                //如果满足四个条件，进行标记
+                //  p9 p2 p3
+                //  p8 p1 p4
+                //  p7 p6 p5
+                uchar p1 = p[j];
+                if (p1 != 1) continue;
+                uchar p4 = (j == width - 1) ? 0 : *(p + j + 1);
+                uchar p8 = (j == 0) ? 0 : *(p + j - 1);
+                uchar p2 = (i == 0) ? 0 : *(p - dst.step + j);
+                uchar p3 = (i == 0 || j == width - 1) ? 0 : *(p - dst.step + j + 1);
+                uchar p9 = (i == 0 || j == 0) ? 0 : *(p - dst.step + j - 1);
+                uchar p6 = (i == height - 1) ? 0 : *(p + dst.step + j);
+                uchar p5 = (i == height - 1 || j == width - 1) ? 0 : *(p + dst.step + j + 1);
+                uchar p7 = (i == height - 1 || j == 0) ? 0 : *(p + dst.step + j - 1);
+
+                if ((p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) >= 2 && (p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9) <= 6)
+                {
+                    int ap = 0;
+                    if (p2 == 0 && p3 == 1) ++ap;
+                    if (p3 == 0 && p4 == 1) ++ap;
+                    if (p4 == 0 && p5 == 1) ++ap;
+                    if (p5 == 0 && p6 == 1) ++ap;
+                    if (p6 == 0 && p7 == 1) ++ap;
+                    if (p7 == 0 && p8 == 1) ++ap;
+                    if (p8 == 0 && p9 == 1) ++ap;
+                    if (p9 == 0 && p2 == 1) ++ap;
+
+                    if (ap == 1 && p2 * p4 * p8 == 0 && p2 * p6 * p8 == 0)
+                    {
+                        //标记
+                        mFlag.push_back(p+j);
+                    }
+                }
+            }
+        }
+
+        //将标记的点删除
+        for (std::vector<uchar *>::iterator i = mFlag.begin(); i != mFlag.end(); ++i)
+        {
+            **i = 0;
+        }
+
+        //直到没有点满足，算法结束
+        if (mFlag.empty())
+        {
+            break;
+        }
+        else
+        {
+            mFlag.clear();//将mFlag清空
+        }
     }
-
-
-    //IplConvKernel *mymodel;
-    //mymodel=cvCreateStructuringElementEx(3,3,1,1,CV_SHAPE_ELLIPSE);
-
-
-    IplImage *img_dilate = cvCreateImage(cvGetSize(m1),m1->depth,m1->nChannels);
-    //IplImage *img_dilate = cvCreateImage(cvGetSize(m1),8,1);
-    cvDilate(m1,img_dilate,NULL,1);
-
-    cvSaveImage((m_path+"/Img_dilate.jpg").toLocal8Bit().data(),img_dilate);
-
-    Mat le = imread((m_path+"/Img_dilate.jpg").toLocal8Bit().data());
-    Mat sharpenedLe;
-    Mat kernel = (Mat_<float>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
-    cv::filter2D(le, sharpenedLe, le.depth(), kernel);
-
-    IplImage fimg=IplImage(sharpenedLe);
-    cvSaveImage((m_path+"/Sharp_pic2.jpg").toLocal8Bit().data(),&fimg);
+    return dst;
 }
-*/
+
+void ImageProcess::ThinImage3_sub1(Mat &pSrc, Mat &pDst)
+{
+    int rows = pSrc.rows;
+    int cols = pSrc.cols;
+    pSrc.copyTo(pDst);
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            if(pSrc.at<float>(i, j) == 1.0f) {
+                /// get 8 neighbors
+                /// calculate C(p)
+                int neighbor0 = (int) pSrc.at<float>( i-1, j-1);
+                int neighbor1 = (int) pSrc.at<float>( i-1, j);
+                int neighbor2 = (int) pSrc.at<float>( i-1, j+1);
+                int neighbor3 = (int) pSrc.at<float>( i, j+1);
+                int neighbor4 = (int) pSrc.at<float>( i+1, j+1);
+                int neighbor5 = (int) pSrc.at<float>( i+1, j);
+                int neighbor6 = (int) pSrc.at<float>( i+1, j-1);
+                int neighbor7 = (int) pSrc.at<float>( i, j-1);
+                int C = int(~neighbor1 & ( neighbor2 | neighbor3)) +
+                        int(~neighbor3 & ( neighbor4 | neighbor5)) +
+                        int(~neighbor5 & ( neighbor6 | neighbor7)) +
+                        int(~neighbor7 & ( neighbor0 | neighbor1));
+                if(C == 1) {
+                    /// calculate N
+                    int N1 = int(neighbor0 | neighbor1) +
+                            int(neighbor2 | neighbor3) +
+                            int(neighbor4 | neighbor5) +
+                            int(neighbor6 | neighbor7);
+                    int N2 = int(neighbor1 | neighbor2) +
+                            int(neighbor3 | neighbor4) +
+                            int(neighbor5 | neighbor6) +
+                            int(neighbor7 | neighbor0);
+                    int N = min(N1,N2);
+                    if ((N == 2) || (N == 3)) {
+                        /// calculate criteria 3
+                        int c3 = ( neighbor1 | neighbor2 | ~neighbor4) & neighbor3;
+                        if(c3 == 0) {
+                            pDst.at<float>( i, j) = 0.0f;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void ImageProcess::ThinImage3_sub2(Mat &pSrc, Mat &pDst)
+{
+    int rows = pSrc.rows;
+    int cols = pSrc.cols;
+    pSrc.copyTo( pDst);
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            if (pSrc.at<float>( i, j) == 1.0f) {
+                /// get 8 neighbors
+                /// calculate C(p)
+                int neighbor0 = (int) pSrc.at<float>( i-1, j-1);
+                int neighbor1 = (int) pSrc.at<float>( i-1, j);
+                int neighbor2 = (int) pSrc.at<float>( i-1, j+1);
+                int neighbor3 = (int) pSrc.at<float>( i, j+1);
+                int neighbor4 = (int) pSrc.at<float>( i+1, j+1);
+                int neighbor5 = (int) pSrc.at<float>( i+1, j);
+                int neighbor6 = (int) pSrc.at<float>( i+1, j-1);
+                int neighbor7 = (int) pSrc.at<float>( i, j-1);
+                int C = int(~neighbor1 & ( neighbor2 | neighbor3)) +
+                        int(~neighbor3 & ( neighbor4 | neighbor5)) +
+                        int(~neighbor5 & ( neighbor6 | neighbor7)) +
+                        int(~neighbor7 & ( neighbor0 | neighbor1));
+                if(C == 1) {
+                    /// calculate N
+                    int N1 = int(neighbor0 | neighbor1) +
+                            int(neighbor2 | neighbor3) +
+                            int(neighbor4 | neighbor5) +
+                            int(neighbor6 | neighbor7);
+                    int N2 = int(neighbor1 | neighbor2) +
+                            int(neighbor3 | neighbor4) +
+                            int(neighbor5 | neighbor6) +
+                            int(neighbor7 | neighbor0);
+                    int N = min(N1,N2);
+                    if((N == 2) || (N == 3)) {
+                        int E = (neighbor5 | neighbor6 | ~neighbor0) & neighbor7;
+                        if(E == 0) {
+                            pDst.at<float>(i, j) = 0.0f;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 bool ImageProcess::dilateImage(IplImage *srcImage)
 {
@@ -752,21 +1052,21 @@ bool ImageProcess::dilateImage(IplImage *srcImage)
 void ImageProcess::DilationImage1_sub1(Mat &src,Mat &dst_diolate,int dilation_size)
 {
     // dst = Mat::zeros(src.size(), src.type());
-      int erosion_type = MORPH_CROSS;
-      Mat ele = getStructuringElement(erosion_type,
-          Size(2 * dilation_size + 1, 2 * dilation_size + 1),
-          Point(dilation_size, dilation_size));
-      dilate(src, dst_diolate, ele);
+    int erosion_type = MORPH_CROSS;
+    Mat ele = getStructuringElement(erosion_type,
+                                    Size(2 * dilation_size + 1, 2 * dilation_size + 1),
+                                    Point(dilation_size, dilation_size));
+    dilate(src, dst_diolate, ele);
 }
 
-void ImageProcess::DilationImage1_sub2(Mat &src,Mat &dst_erosion,int erosion_size)
+void ImageProcess::ErosionImage1_sub1(Mat &src,Mat &dst_erosion,int erosion_size)
 {
     int erosion_type = MORPH_CROSS;
-        Mat element = getStructuringElement(erosion_type,
-            Size(2 * erosion_size + 1, 2 * erosion_size + 1),
-            Point(erosion_size, erosion_size));
-        ///膨胀操作
-        erode(src, dst_erosion, element);
+    Mat element = getStructuringElement(erosion_type,
+                                        Size(2 * erosion_size + 1, 2 * erosion_size + 1),
+                                        Point(erosion_size, erosion_size));
+    ///膨胀操作
+    erode(src, dst_erosion, element);
 }
 
 IplImage *ImageProcess::QImageToIplImage(const QImage *qImage)
@@ -835,6 +1135,34 @@ QImage *ImageProcess::IplImageToQImage(IplImage *image)
 
 }
 
+void ImageProcess::merageImages(vector<Mat> images, Mat &dst,int cut_rows,int cut_cols)
+{
+    //将这些小图片重新合成一张大图
+    vector<vector<Mat>> ceilImags;
+    vector<Mat> r_Images;
+    for (int i = 0; i < cut_rows;i++)
+    {
+        for (int j = 0; j < cut_cols; j++)
+        {
+            if(i < 10){
+                r_Images.push_back(images[i*10+j]);
+            }else if(i >= 10){
+                r_Images.push_back(images[i*100+j]);
+            }
+        }
+        ceilImags.push_back(r_Images);
+        r_Images.clear();
+    }
+    vector<Mat> rowImags;
+    Mat rowImag;
+    for (int i = 0; i < cut_rows; i++)
+    {
+        hconcat(ceilImags[i], rowImag);
+        rowImags.push_back(rowImag.clone());
+    }
+    vconcat(rowImags,dst);
+}
+
 QString ImageProcess::getImgType(int imgTypeInt)
 {
     int numImgTypes = 35; // 7 base types, with five channel options each (none or C1, ..., C4)
@@ -848,12 +1176,12 @@ QString ImageProcess::getImgType(int imgTypeInt)
                              CV_64F, CV_64FC1, CV_64FC2, CV_64FC3, CV_64FC4};
 
     QString enum_strings[] = {"CV_8U",  "CV_8UC1",  "CV_8UC2",  "CV_8UC3",  "CV_8UC4",
-                             "CV_8S",  "CV_8SC1",  "CV_8SC2",  "CV_8SC3",  "CV_8SC4",
-                             "CV_16U", "CV_16UC1", "CV_16UC2", "CV_16UC3", "CV_16UC4",
-                             "CV_16S", "CV_16SC1", "CV_16SC2", "CV_16SC3", "CV_16SC4",
-                             "CV_32S", "CV_32SC1", "CV_32SC2", "CV_32SC3", "CV_32SC4",
-                             "CV_32F", "CV_32FC1", "CV_32FC2", "CV_32FC3", "CV_32FC4",
-                             "CV_64F", "CV_64FC1", "CV_64FC2", "CV_64FC3", "CV_64FC4"};
+                              "CV_8S",  "CV_8SC1",  "CV_8SC2",  "CV_8SC3",  "CV_8SC4",
+                              "CV_16U", "CV_16UC1", "CV_16UC2", "CV_16UC3", "CV_16UC4",
+                              "CV_16S", "CV_16SC1", "CV_16SC2", "CV_16SC3", "CV_16SC4",
+                              "CV_32S", "CV_32SC1", "CV_32SC2", "CV_32SC3", "CV_32SC4",
+                              "CV_32F", "CV_32FC1", "CV_32FC2", "CV_32FC3", "CV_32FC4",
+                              "CV_64F", "CV_64FC1", "CV_64FC2", "CV_64FC3", "CV_64FC4"};
 
     for(int i=0; i<numImgTypes; i++)
     {
@@ -907,258 +1235,9 @@ vector<Mat> ImageProcess::cutPics(IplImage *img)
     }
 }
 
-Mat ImageProcess::CutPics(QString path, QString fileTarget)
-{
-    Mat bigImage;
-    //分割图片
-    int cut_rows = 10, cut_cols = 10; //将一张图片切割为10*10小图片
-    Mat srcImg = imread(path.toLocal8Bit().data());
-    vector<Mat> ceilImg;
-    int height = srcImg.rows;
-    int width = srcImg.cols;
-    int ceil_height = (int)(height / cut_rows);
-    int ceil_width = (int)(width / cut_cols);
-    int ceil_down_height = height - (cut_rows - 1)*ceil_height;
-    int ceil_right_width = width - (cut_cols - 1)*ceil_width;
-    for (int i = 0; i<cut_rows - 1; i++)
-        for (int j = 0; j<cut_cols; j++)
-        {
-            if (j<cut_cols - 1)
-            {
-                Rect rect(j*ceil_width, i*ceil_height, ceil_width, ceil_height);
-                ceilImg.push_back(srcImg(rect));
-            }
-            else
-            {
-                Rect rect((cut_cols - 1)*ceil_width, i*ceil_height, ceil_right_width, ceil_height);
-                ceilImg.push_back(srcImg(rect));
-            }
-        }
-    for (int i = 0; i<cut_cols; i++)
-    {
-        if (i<cut_cols - 1)
-        {
-            Rect rect(i*ceil_width, (cut_rows - 1)*ceil_height, ceil_width, ceil_down_height);
-            ceilImg.push_back(srcImg(rect));
-        }
-        else   //右下角这个图像块
-        {
-            Rect rect((cut_cols - 1)*ceil_width, (cut_rows - 1)*ceil_height, ceil_right_width, ceil_down_height);
-            ceilImg.push_back(srcImg(rect));
-        }
-    }
-
-    Mat dst,dst1,dst2,dst3,dst4;
-    vector<Mat> images;
-
-    //对每张小图片进行滤波，二值化处理
-    for (int i = 0; i < ceilImg.size(); i++)
-    {
-        cvtColor(ceilImg[i], dst1, COLOR_BGR2GRAY);
-        //dst = ceilImg[i];
-        //高斯滤波
-        GaussianBlur(dst1,dst2, Size(7,7), 0);
-        //threshold(dst1,dst3,127,255,THRESH_OTSU | THRESH_BINARY);
-        //自适应阈值分割
-//        adaptiveThreshold(dst1,dst4,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,9,5);
-        adaptiveThreshold(dst1,dst,255,ADAPTIVE_THRESH_GAUSSIAN_C,THRESH_BINARY_INV,11,2);
-//        GaussianBlur(dst,dst, Size(3,3), 0);
-        images.push_back(dst.clone());
-    }
-
-    //将这些小图片重新合成一张大图
-    vector<vector<Mat>> ceilImags;
-    vector<Mat> r_Images;
-    for (int i = 0; i < 10;i++)
-    {
-        for (int j = 0; j < 10; j++)
-        {
-            r_Images.push_back(images[i*10+j]);
-        }
-        ceilImags.push_back(r_Images);
-        r_Images.clear();
-    }
-    vector<Mat> rowImags;
-    Mat rowImag;
-    for (int i = 0; i < 10; i++)
-    {
-        hconcat( ceilImags[i], rowImag);
-        rowImags.push_back(rowImag.clone());
-    }
-    vconcat(rowImags,bigImage);
-    //GaussianBlur(bigImage,bigImage, Size(3,3), 0);
-    threshold(bigImage,bigImage,1,255,THRESH_BINARY_INV);
-
-    QString fpath = fileTarget + "/test.png";
-    imwrite(fpath.toLocal8Bit().data(), bigImage);
-    //imshow("bigImage", bigImage);
-
-    return bigImage;
-}
-
-void ImageProcess::ThinImage(const QString &path, const QString &fileTarget)
-{
-    qDebug() << "start: " << __func__;
-    Mat inputarray = imread(path.toLocal8Bit().data());
-    //imshow("inputarray1", inputarray);
-    //waitKey(0);
-    //inputarray = inputarray(Rect(10, 10, inputarray.cols - 20, inputarray.rows - 20));
-    threshold(inputarray, inputarray, 100, 255, CV_THRESH_BINARY);
-    //imshow("inputarray2", inputarray);
-    //waitKey(0);
-    //qDebug() << "theType1: " << getImgType(inputarray.type());
-    Mat outputarray(inputarray.rows,inputarray.cols,CV_32FC1);
-
-    bool bDone = false;
-    int rows = inputarray.rows;
-    int cols = inputarray.cols;
-
-    inputarray.convertTo(inputarray, CV_32FC1);
-    inputarray.copyTo(outputarray);
-    //qDebug() << "theType2: " << getImgType(inputarray.type());
-    //imshow("inputarray3", inputarray);
-    //waitKey(0);
-    //outputarray.convertTo(outputarray, CV_32FC1);
-
-    /// pad source
-    Mat p_enlarged_src = Mat(rows + 2, cols + 2, CV_32FC1);
-    for (int i = 0; i < (rows + 2); i++) {
-        p_enlarged_src.at<float>(i, 0) = 0.0f;
-        p_enlarged_src.at<float>(i, cols + 1) = 0.0f;
-    }
-    for (int j = 0; j < (cols + 2); j++) {
-        p_enlarged_src.at<float>(0, j) = 0.0f;
-        p_enlarged_src.at<float>(rows + 1, j) = 0.0f;
-    }
-    //imshow("p_enlarged_src1", p_enlarged_src);
-    //waitKey(0);
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (inputarray.at<float>(i, j) >= 20.0f) {
-                p_enlarged_src.at<float>(i + 1, j + 1) = 1.0f;
-            }
-            else{
-                p_enlarged_src.at<float>(i + 1, j + 1) = 0.0f;
-            }
-        }
-    }
-    //imshow("p_enlarged_src2", p_enlarged_src);
-    //waitKey(0);
-    /// start to thin
-    Mat p_thinMat1 = Mat::zeros(rows + 2, cols + 2, CV_32FC1);
-    Mat p_thinMat2 = Mat::zeros(rows + 2, cols + 2, CV_32FC1);
-    Mat p_cmp = Mat::zeros(rows + 2, cols + 2, CV_8UC1);
-
-    while (bDone != true) {
-        /// sub-iteration 1
-        ThinImage_sub1(p_enlarged_src, p_thinMat1);
-        /// sub-iteration 2
-        //ThinImage_sub2(p_thinMat1, p_thinMat2);
-        /// compare
-        compare(p_enlarged_src, p_thinMat1, p_cmp, CV_CMP_EQ);
-        /// check
-        int num_non_zero = countNonZero(p_cmp);
-        if (num_non_zero == (rows + 2) * (cols + 2)) {
-            bDone = true;
-        }
-        /// copy
-        p_thinMat1.copyTo(p_enlarged_src);
-    }
-    //imshow("p_thinMat1", p_thinMat1);
-    //imshow("p_cmp", p_cmp);
-    //imshow("p_enlarged_src3", p_enlarged_src);
-    //waitKey(0);
-    // copy result
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            outputarray.at<float>(i, j) = p_enlarged_src.at<float>(i + 1, j + 1);
-        }
-    }
-    //imshow("inputarray4", inputarray);
-    //imshow("p_enlarged_src4", p_enlarged_src);
-    //imshow("ThinImage", outputarray);
-    imshow("ThinImage", outputarray);
-    waitKey(0);
-    QString fpath = fileTarget + "/ThinImage.png";
-    imwrite(fpath.toLocal8Bit().data(), outputarray);
-    qDebug() << "end: " << __func__;
-
-}
-
-void ImageProcess::ThinImage1(const QString &path, const QString &fileTarget)
-{
-    qDebug() << "start: " << __func__;
-    cv::Mat src = imread(path.toLocal8Bit().data());
-    cvtColor(src,src,COLOR_BGR2GRAY);
-    threshold(src,src,100,255,THRESH_BINARY);
-    Mat dst;
-    ThinImage1_sub(src,dst,12);
-    imshow("ThinImage1",dst);
-    waitKey(0);
-    QString fpath = fileTarget + "/ThinImage1.png";
-    imwrite(fpath.toLocal8Bit().data(), dst);
-    qDebug() << "end: " << __func__;
-
-}
-
-void ImageProcess::ThinImage2(const QString &path, const QString &fileTarget)
-{
-    qDebug() << "start: " << __func__;
-    //获取图像
-    cv::Mat src = cv::imread(path.toLocal8Bit().data(), cv::IMREAD_GRAYSCALE);
-    if (src.empty())
-    {
-        std::cout << "读取文件失败！" << std::endl;
-        return;
-    }
-    //将原图像转换为二值图像
-    cv::threshold(src, src, 128, 1, cv::THRESH_BINARY);
-    //图像细化
-    cv::Mat dst = ThinImage2_sub(src);
-    //显示图像
-    dst = dst * 255;
-    //cv::namedWindow("src1", CV_WINDOW_AUTOSIZE);
-    //cv::namedWindow("dst1", CV_WINDOW_AUTOSIZE);
-    //cv::imshow("src1", src);
-    cv::imshow("ThinImage2", dst);
-    cv::waitKey(0);
-    QString fpath = fileTarget + "/ThinImage2.png";
-    imwrite(fpath.toLocal8Bit().data(), dst);
-    qDebug() << "end: " << __func__;
-
-}
-
-void ImageProcess::DilationImage1(const QString &path, const QString &fileTarget)
-{
-    qDebug() << "start: " << __func__;
-    Mat src, dst_diolate, dst_erosion;
-    int erosion_size = 1;
-    int dilation_size = 1;
-    src = imread(path.toLocal8Bit().data());
-    //namedWindow("Dilation Demo", CV_WINDOW_AUTOSIZE);
-    //namedWindow("Erosion Demo", CV_WINDOW_AUTOSIZE);
-
-    //cvMoveWindow("Dilation Demo", src.cols, 0);
-    //cvMoveWindow("Erosion Demo", src.cols, 0);
-
-    DilationImage1_sub1(src,dst_diolate,dilation_size);
-    imshow("dst_diolate", dst_diolate);
-    DilationImage1_sub2(src,dst_erosion,erosion_size);
-    imshow("dst_erosion", dst_erosion);
-    waitKey();
-    QString fpath = fileTarget + "/DilationImage1_diolate.png";
-    imwrite(fpath.toLocal8Bit().data(), dst_diolate);
-    fpath = fileTarget + "/DilationImage1_erosion.png";
-    imwrite(fpath.toLocal8Bit().data(), dst_erosion);
-    qDebug() << "end: " << __func__;
-}
 
 
-
-
-enum adaptiveMethod{meanFilter,gaaussianFilter,medianFilter};
-
-void AdaptiveThreshold(cv::Mat& src, cv::Mat& dst, double Maxval, int Subsize, double c, adaptiveMethod method = meanFilter){
+void ImageProcess::AdaptiveThreshold(cv::Mat& src, cv::Mat& dst, double Maxval, int Subsize, double c, adaptiveMethod method){
 
     if (src.channels() > 1)
         cv::cvtColor(src, src, CV_RGB2GRAY);
@@ -1195,4 +1274,69 @@ void AdaptiveThreshold(cv::Mat& src, cv::Mat& dst, double Maxval, int Subsize, d
                 dstptr[c] = 0;
         }
     }
- }
+}
+
+void ImageProcess::AdaptiveThereshold(Mat &src, Mat &dst)
+{
+    cvtColor(src,dst,CV_BGR2GRAY);
+    int x1, y1, x2, y2;
+    int count=0;
+    long long sum=0;
+    int S=src.rows>>3;  //划分区域的大小S*S
+    int T=15;         /*百分比，用来最后与阈值的比较。原文：If the value of the current pixel is t percent less than this average
+                                then it is set to black, otherwise it is set to white.*/
+    int W=dst.cols;
+    int H=dst.rows;
+    long long **Argv;
+    Argv=new long long*[dst.rows];
+    for(int ii=0;ii<dst.rows;ii++)
+    {
+        Argv[ii]=new long long[dst.cols];
+    }
+
+    for(int i=0;i<W;i++)
+    {
+        sum=0;
+        for(int j=0;j<H;j++)
+        {
+            sum+=dst.at<uchar>(j,i);
+            if(i==0)
+                Argv[j][i]=sum;
+            else
+                Argv[j][i]=Argv[j][i-1]+sum;
+        }
+    }
+
+    for(int i=0;i<W;i++)
+    {
+        for(int j=0;j<H;j++)
+        {
+            x1=i-S/2;
+            x2=i+S/2;
+            y1=j-S/2;
+            y2=j+S/2;
+            if(x1<0)
+                x1=0;
+            if(x2>=W)
+                x2=W-1;
+            if(y1<0)
+                y1=0;
+            if(y2>=H)
+                y2=H-1;
+            count=(x2-x1)*(y2-y1);
+            sum=Argv[y2][x2]-Argv[y1][x2]-Argv[y2][x1]+Argv[y1][x1];
+
+
+            if((long long)(dst.at<uchar>(j,i)*count)<(long long)sum*(100-T)/100)
+                dst.at<uchar>(j,i)=0;
+            else
+                dst.at<uchar>(j,i)=255;
+        }
+    }
+    for (int i = 0 ; i < dst.rows; ++i)
+    {
+        delete [] Argv[i];
+    }
+    delete [] Argv;
+
+}

@@ -1,0 +1,16 @@
+picture1：
+开始识别:  945587
+识别结束:  95979371
+OCR Total time: 95.0338
+picture2:
+开始识别:  563975
+识别结束:  131701126
+OCR Total time: 131.137
+picture3:
+开始识别:  495541
+识别结束:  201530671
+OCR Total time: 201.035
+pircture4:
+开始识别:  717344
+识别结束:  125592039
+OCR Total time: 124.875
