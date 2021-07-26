@@ -260,7 +260,7 @@ void Textord::TextordPage(PageSegMode pageseg_mode, const FCOORD &reskew, int wi
 }
 
 // If we were supposed to return only a single textline, and there is more
-// than one, clean up and leave only the best.
+// than one, clean up and leave only the best.如果我们应该只返回一个文本行，而有多个文本行，那么清理并只留下最好的。
 void Textord::CleanupSingleRowResult(PageSegMode pageseg_mode, PAGE_RES *page_res) {
   if (PSM_LINE_FIND_ENABLED(pageseg_mode) || PSM_SPARSE(pageseg_mode)) {
     return; // No cleanup required.

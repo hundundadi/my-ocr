@@ -34,6 +34,7 @@ constexpr int kPointsPerInch = 72;
 /**
  * Minimum believable resolution. Used as a default if there is no other
  * information, as it is safer to under-estimate than over-estimate.
+ * 最低可信的解决方案。在没有其他信息的情况下使用，因为低估比高估更安全。
  */
 constexpr int kMinCredibleResolution = 70;
 /** Maximum believable resolution.  */
@@ -155,24 +156,26 @@ enum TextlineOrder {
  * Possible modes for page layout analysis. These *must* be kept in order
  * of decreasing amount of layout analysis to be done, except for OSD_ONLY,
  * so that the inequality test macros below work.
+ *
+ * 页面布局分析的可能模式。除了OSD_ONLY之外，这些*必须*按照减少要做的布局分析数量的顺序保存，以便下面的不等式测试宏工作。
  */
 enum PageSegMode {
   PSM_OSD_ONLY = 0,      ///< Orientation and script detection only.
   PSM_AUTO_OSD = 1,      ///< Automatic page segmentation with orientation and
-                         ///< script detection. (OSD)
+                         ///< script detection. (OSD)自动页分割与方向和脚本检测。(OSD)
   PSM_AUTO_ONLY = 2,     ///< Automatic page segmentation, but no OSD, or OCR.
   PSM_AUTO = 3,          ///< Fully automatic page segmentation, but no OSD.
   PSM_SINGLE_COLUMN = 4, ///< Assume a single column of text of variable sizes.
   PSM_SINGLE_BLOCK_VERT_TEXT = 5, ///< Assume a single uniform block of
                                   ///< vertically aligned text.
-  PSM_SINGLE_BLOCK = 6, ///< Assume a single uniform block of text. (Default.)
+  PSM_SINGLE_BLOCK = 6, ///< Assume a single uniform block of text. (Default.)假设是一个统一的文本块。(默认)。
   PSM_SINGLE_LINE = 7,  ///< Treat the image as a single text line.
   PSM_SINGLE_WORD = 8,  ///< Treat the image as a single word.
   PSM_CIRCLE_WORD = 9,  ///< Treat the image as a single word in a circle.
   PSM_SINGLE_CHAR = 10, ///< Treat the image as a single character.
   PSM_SPARSE_TEXT =
       11, ///< Find as much text as possible in no particular order.
-  PSM_SPARSE_TEXT_OSD = 12, ///< Sparse text with orientation and script det.
+  PSM_SPARSE_TEXT_OSD = 12, ///< Sparse text with orientation and script det.带有方向和脚本det的稀疏文本。
   PSM_RAW_LINE = 13, ///< Treat the image as a single text line, bypassing
                      ///< hacks that are Tesseract-specific.
 
@@ -184,6 +187,9 @@ enum PageSegMode {
  * layout analysis are enabled.
  * *Depend critically on the order of elements of PageSegMode.*
  * NOTE that arg is an int for compatibility with INT_PARAM.
+ * 作用于PageSegMode以确定布局分析组件是否启用的内联函数。
+ * 严格依赖PageSegMode.*元素的顺序
+ * 注意，为了与INT_PARAM兼容，arg是一个int。
  */
 inline bool PSM_OSD_ENABLED(int pageseg_mode) {
   return pageseg_mode <= PSM_AUTO_OSD || pageseg_mode == PSM_SPARSE_TEXT_OSD;
@@ -211,14 +217,14 @@ inline bool PSM_WORD_FIND_ENABLED(int pageseg_mode) {
 /**
  * enum of the elements of the page hierarchy, used in ResultIterator
  * to provide functions that operate on each level without having to
- * have 5x as many functions.
+ * have 5x as many functions.页面层次结构元素的枚举，在ResultIterator中用于提供在每一层上操作的函数，而不必拥有5x多的函数。
  */
 enum PageIteratorLevel {
-  RIL_BLOCK,    // Block of text/image/separator line.
-  RIL_PARA,     // Paragraph within a block.
-  RIL_TEXTLINE, // Line within a paragraph.
-  RIL_WORD,     // Word within a textline.
-  RIL_SYMBOL    // Symbol/character within a word.
+  RIL_BLOCK,    // Block of text/image/separator line.文本/图像/分隔线块。
+  RIL_PARA,     // Paragraph within a block.块内的段落。
+  RIL_TEXTLINE, // Line within a paragraph.段落中的一行。
+  RIL_WORD,     // Word within a textline.文本行的单词。
+  RIL_SYMBOL    // Symbol/character within a word.单词中的符号/字符。
 };
 
 /**
@@ -261,13 +267,19 @@ enum ParagraphJustification {
  * appropriate changes to all the enums mirroring it (e.g. OCREngine in
  * cityblock/workflow/detection/detection_storage.proto). Such enums will
  * mention the connection to OcrEngineMode in the comments.
+ *
+ * 当Tesseract/Cube被初始化时，我们可以选择只实例化/加载/运行Tesseract部分、Cube部分或两者连同合并器一起运行。
+ * 使用哪个引擎的首选项存储在tessedit_ocr_engine_mode中。
+ * 注意:当修改此枚举时，请确保对所有与之镜像的枚举做相应的修改
+ * (例如:cityblock/workflow/detection/detection_storage.proto中的OCREngine)。
+ * 这样的枚举会在评论中提到与OcrEngineMode的连接。
  */
 enum OcrEngineMode {
   OEM_TESSERACT_ONLY,          // Run Tesseract only - fastest; deprecated
   OEM_LSTM_ONLY,               // Run just the LSTM line recognizer.
   OEM_TESSERACT_LSTM_COMBINED, // Run the LSTM recognizer, but allow fallback
                                // to Tesseract when things get difficult.
-                               // deprecated
+                               // deprecated 运行LSTM识别器，但当事情变得困难时允许回退到Tesseract。弃用
   OEM_DEFAULT,                 // Specify this mode when calling init_*(),
                                // to indicate that any of the above modes
                                // should be automatically inferred from the
@@ -275,6 +287,9 @@ enum OcrEngineMode {
                                // command-line configs, or if not specified
                                // in any of the above should be set to the
                                // default OEM_TESSERACT_ONLY.
+                               // 在调用init_*()时指定此模式，以指示应该从特定于语言的配置、命令行配置中的变量中自动推断上述任何模式，
+                               // 或者如果没有在上述任何配置中指定，则应将其设置为默认的OEM_TESSERACT_ONLY。
+
   OEM_COUNT                    // Number of OEMs
 };
 

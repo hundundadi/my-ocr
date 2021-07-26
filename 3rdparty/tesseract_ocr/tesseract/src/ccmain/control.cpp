@@ -140,7 +140,7 @@ bool Tesseract::ProcessTargetWord(const TBOX &word_box, const TBOX &target_word_
   return true;
 }
 
-/** If tesseract is to be run, sets the words up ready for it. */
+/** If tesseract is to be run, sets the words up ready for it. 如果tesseract要运行，请为它设置好单词。 */
 void Tesseract::SetupAllWordsPassN(int pass_n, const TBOX *target_word_box, const char *word_config,
                                    PAGE_RES *page_res, std::vector<WordData> *words) {
   // Prepare all the words.
@@ -192,14 +192,14 @@ void Tesseract::SetupWordPassN(int pass_n, WordData *word) {
   }
 }
 
-// Runs word recognition on all the words.
+// Runs word recognition on all the words.对所有单词进行单词识别。
 bool Tesseract::RecogAllWordsPassN(int pass_n, ETEXT_DESC *monitor, PAGE_RES_IT *pr_it,
                                    std::vector<WordData> *words) {
   // TODO(rays) Before this loop can be parallelized (it would yield a massive
   // speed-up) all remaining member globals need to be converted to local/heap
   // (eg set_pass1 and set_pass2) and an intermediate adaption pass needs to be
   // added. The results will be significantly different with adaption on, and
-  // deterioration will need investigation.
+  // deterioration will need investigation.在这个循环可以并行化之前(它将产生一个巨大的加速)，所有剩余的成员全局变量需要被转换为本地/堆(例如set_pass1和set_pass2)，并且需要添加一个中间的适应通道。结果将显著不同的适应，变质将需要调查。
   pr_it->restart_page();
   for (unsigned w = 0; w < words->size(); ++w) {
     WordData *word = &(*words)[w];
@@ -235,7 +235,7 @@ bool Tesseract::RecogAllWordsPassN(int pass_n, ETEXT_DESC *monitor, PAGE_RES_IT 
         continue;
       }
     }
-    // Sync pr_it with the WordData.
+    // Sync pr_it with the WordData.将pr_it与WordData同步。
     while (pr_it->word() != nullptr && pr_it->word() != word->word) {
       pr_it->forward();
     }
@@ -243,11 +243,12 @@ bool Tesseract::RecogAllWordsPassN(int pass_n, ETEXT_DESC *monitor, PAGE_RES_IT 
     bool make_next_word_fuzzy = false;
 #ifndef DISABLED_LEGACY_ENGINE
     if (!AnyLSTMLang() && ReassignDiacritics(pass_n, pr_it, &make_next_word_fuzzy)) {
-      // Needs to be setup again to see the new outlines in the chopped_word.
+      // Needs to be setup again to see the new outlines in the chopped_word.需要再次设置以查看chopped_word中的新大纲。
       SetupWordPassN(pass_n, word);
     }
 #endif // ndef DISABLED_LEGACY_ENGINE
-
+    //分类单词的通用函数。可根据传递给识别器的函数用于pass1或pass2。word_data保存要识别的单词，以及它的块和行，而pr_it也指向这个单词，以防我们运行LSTM并且它想输出多个单词。用当前的语言识别，如果成功，那就是全部。如果识别不成功，请尝试所有可用的语言，直到获得成功的结果或耗尽所有语言。保持最好的结果。
+    //此处耗时最多，应该有优化空间
     classify_word_and_language(pass_n, pr_it, word);
     if (tessedit_dump_choices || debug_noise_removal) {
       tprintf("Pass%d: %s [%s]\n", pass_n, word->word->best_choice->unichar_string().c_str(),
@@ -274,11 +275,16 @@ bool Tesseract::RecogAllWordsPassN(int pass_n, ETEXT_DESC *monitor, PAGE_RES_IT 
  * target word(s), otherwise, on pass 2 and beyond ONLY the target words
  * are processed (Jetsoft modification.)
  * Returns false if we cancelled prematurely.
- *
- * @param page_res page structure
- * @param monitor progress monitor
- * @param word_config word_config file
- * @param target_word_box specifies just to extract a rectangle
+ *遍历页面，识别所有的单词。
+ * 如果monitor不为空，它被用作进度监视器/超时/取消。
+ * 如果dopasses为0，则运行所有的识别pass, 1只是pass 1, 2 pass 2和更高。
+ * 如果target_word_box不为空，则对重叠target_word_box的单词进行特殊处理:
+ * 如果word_config不为空，则只读取目标单词的配置文件，否则，在第2步和之后，只处理目标单词(Jetsoft修改)。
+ * 如果提前取消，返回false。
+ * @param page_res page structure  页面结构
+ * @param monitor progress monitor 进度监控
+ * @param word_config word_config file 单词配置文件
+ * @param target_word_box specifies just to extract a rectangle 指定仅提取一个矩形
  * @param dopasses 0 - all, 1 just pass 1, 2 passes 2 and higher
  */
 
@@ -300,13 +306,13 @@ bool Tesseract::recog_all_words(PAGE_RES *page_res, ETEXT_DESC *monitor,
     // If the adaptive classifier is full switch to one we prepared earlier,
     // ie on the previous page. If the current adaptive classifier is non-empty,
     // prepare a backup starting at this page, in case it fills up. Do all this
-    // independently for each language.
+    // independently for each language.如果自适应分类器完全切换到我们之前准备的，即上一页。如果当前的自适应分类器是非空的，准备从这个页面开始的备份，以防它被填满。为每种语言独立完成所有这些工作。
     if (AdaptiveClassifierIsFull()) {
       SwitchAdaptiveClassifier();
     } else if (!AdaptiveClassifierIsEmpty()) {
       StartBackupAdaptiveClassifier();
     }
-    // Now check the sub-langs as well.
+    // Now check the sub-langs as well.现在也检查一下子语言。
     for (auto &lang : sub_langs_) {
       if (lang->AdaptiveClassifierIsFull()) {
         lang->SwitchAdaptiveClassifier();
@@ -318,7 +324,7 @@ bool Tesseract::recog_all_words(PAGE_RES *page_res, ETEXT_DESC *monitor,
 #endif // ndef DISABLED_LEGACY_ENGINE
 
     // Set up all words ready for recognition, so that if parallelism is on
-    // all the input and output classes are ready to run the classifier.
+    // all the input and output classes are ready to run the classifier.设置所有准备好识别的单词，以便如果并行性在所有输入和输出类上都准备好运行分类器。
     std::vector<WordData> words;
     SetupAllWordsPassN(1, target_word_box, word_config, page_res, &words);
 #ifndef DISABLED_LEGACY_ENGINE
@@ -337,11 +343,11 @@ bool Tesseract::recog_all_words(PAGE_RES *page_res, ETEXT_DESC *monitor,
     stats_.doc_good_char_quality = 0;
 
     most_recently_used_ = this;
-    // Run pass 1 word recognition.
+    // Run pass 1 word recognition. 运行pass 1单词识别。
     if (!RecogAllWordsPassN(1, monitor, &page_res_it, &words)) {
       return false;
     }
-    // Pass 1 post-processing.
+    // Pass 1 post-processing. 通过1后处理。
     for (page_res_it.restart_page(); page_res_it.word() != nullptr; page_res_it.forward()) {
       if (page_res_it.word()->word->flag(W_REP_CHAR)) {
         fix_rep_char(&page_res_it);
@@ -386,7 +392,7 @@ bool Tesseract::recog_all_words(PAGE_RES *page_res, ETEXT_DESC *monitor,
   // The next passes are only required for Tess-only.
   if (AnyTessLang() && !AnyLSTMLang()) {
     // ****************** Pass 3 *******************
-    // Fix fuzzy spaces.
+    // Fix fuzzy spaces. 修复模糊空间。
 
     if (!tessedit_test_adaption && tessedit_fix_fuzzy_spaces && !tessedit_word_for_word &&
         !right_to_left()) {
@@ -408,7 +414,7 @@ bool Tesseract::recog_all_words(PAGE_RES *page_res, ETEXT_DESC *monitor,
     font_recognition_pass(page_res);
 
     // ****************** Pass 9 *******************
-    // Check the correctness of the final results.
+    // Check the correctness of the final results.检查最终结果的正确性。
     blamer_pass(page_res);
     script_pos_pass(page_res);
   }
@@ -420,8 +426,8 @@ bool Tesseract::recog_all_words(PAGE_RES *page_res, ETEXT_DESC *monitor,
   // bounding boxes and style information.
 
 #ifndef DISABLED_LEGACY_ENGINE
-  // changed by jetsoft
-  // needed for dll to output memory structure
+  // changed by jetsoft 改变了jetsoft
+  // needed for dll to output memory structure 需要DLL输出内存结构
   if ((dopasses == 0 || dopasses == 2) && (monitor || tessedit_write_unlv)) {
     output_pass(page_res_it, target_word_box);
   }
@@ -431,7 +437,7 @@ bool Tesseract::recog_all_words(PAGE_RES *page_res, ETEXT_DESC *monitor,
   const auto pageseg_mode = static_cast<PageSegMode>(static_cast<int>(tessedit_pageseg_mode));
   textord_.CleanupSingleRowResult(pageseg_mode, page_res);
 
-  // Remove empty words, as these mess up the result iterators.
+  // Remove empty words, as these mess up the result iterators.删除空的单词，因为这些会打乱结果迭代器。
   for (page_res_it.restart_page(); page_res_it.word() != nullptr; page_res_it.forward()) {
     const WERD_RES *word = page_res_it.word();
     const POLY_BLOCK *pb = page_res_it.block()->block != nullptr
@@ -908,7 +914,7 @@ static bool WordsAcceptable(const PointerVector<WERD_RES> &words) {
 
 // Moves good-looking "noise"/diacritics from the reject list to the main
 // blob list on the current word. Returns true if anything was done, and
-// sets make_next_word_fuzzy if blob(s) were added to the end of the word.
+// sets make_next_word_fuzzy if blob(s) were added to the end of the word.将相似的“噪声”/变音符从拒绝列表移动到当前单词的主斑点列表。如果完成了任何操作，返回true，如果blob(s)被添加到单词的末尾，则设置make_next_word_fuzzy。
 bool Tesseract::ReassignDiacritics(int pass, PAGE_RES_IT *pr_it, bool *make_next_word_fuzzy) {
   *make_next_word_fuzzy = false;
   WERD *real_word = pr_it->word()->word;
@@ -1289,7 +1295,7 @@ float Tesseract::ClassifyBlobAsWord(int pass_n, PAGE_RES_IT *pr_it, C_BLOB *blob
 // to output multiple words.
 // Recognizes in the current language, and if successful that is all.
 // If recognition was not successful, tries all available languages until
-// it gets a successful result or runs out of languages. Keeps the best result.
+// it gets a successful result or runs out of languages. Keeps the best result.分类单词的通用函数。可根据传递给识别器的函数用于pass1或pass2。word_data保存要识别的单词，以及它的块和行，而pr_it也指向这个单词，以防我们运行LSTM并且它想输出多个单词。用当前的语言识别，如果成功，那就是全部。如果识别不成功，请尝试所有可用的语言，直到获得成功的结果或耗尽所有语言。保持最好的结果。
 void Tesseract::classify_word_and_language(int pass_n, PAGE_RES_IT *pr_it, WordData *word_data) {
 #ifdef DISABLED_LEGACY_ENGINE
   WordRecognizer recognizer = &Tesseract::classify_word_pass1;

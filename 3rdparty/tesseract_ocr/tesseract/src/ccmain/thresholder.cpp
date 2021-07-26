@@ -152,6 +152,10 @@ void ImageThresholder::GetImageSizes(int *left, int *top, int *width, int *heigh
 // SetImage for Pix clones its input, so the source pix may be pixDestroyed
 // immediately after, but may not go away until after the Thresholder has
 // finished with it.
+/**
+ *Pix vs raw，使用哪个?Pix是提高效率的首选输入，因为原始缓冲区是复制的。
+ * SetImage for Pix复制了它的输入，所以源的Pix可能会被pixDestroyed后立即销毁，但可能不会消失，直到分割完成。
+ */
 void ImageThresholder::SetImage(const Image pix) {
   if (pix_ != nullptr) {
     pix_.destroy();
@@ -188,6 +192,10 @@ void ImageThresholder::SetImage(const Image pix) {
 // Creates a Pix and sets pix to point to the resulting pointer.
 // Caller must use pixDestroy to free the created Pix.
 /// Returns false on error.
+/// 分割原图像尽可能达到有效的输出图像。
+/// 创建一个Pix并设置Pix指向结果指针。
+/// 调用者必须使用pixDestroy来释放创建的图片。
+/// 错误时返回false。
 bool ImageThresholder::ThresholdToPix(PageSegMode pageseg_mode, Image *pix) {
   if (image_width_ > INT16_MAX || image_height_ > INT16_MAX) {
     tprintf("Image too large: (%d, %d)\n", image_width_, image_height_);
@@ -195,7 +203,7 @@ bool ImageThresholder::ThresholdToPix(PageSegMode pageseg_mode, Image *pix) {
   }
   if (pix_channels_ == 0) {
     // We have a binary image, but it still has to be copied, as this API
-    // allows the caller to modify the output.
+    // allows the caller to modify the output.我们有一个二进值图像，但它仍然需要复制，就像这个API允许调用者修改输出。
     Image original = GetPixRect();
     *pix = original.copy();
     original.destroy();
@@ -229,7 +237,7 @@ Image ImageThresholder::GetPixRectThresholds() {
   return pix_thresholds;
 }
 
-// Common initialization shared between SetImage methods.
+// Common initialization shared between SetImage methods. SetImage方法之间共享的公共初始化。
 void ImageThresholder::Init() {
   SetRectangle(0, 0, image_width_, image_height_);
 }
@@ -272,14 +280,14 @@ Image ImageThresholder::GetPixRectGrey() {
   return pix;
 }
 
-// Otsu thresholds the rectangle, taking the rectangle from *this.
+// Otsu thresholds the rectangle, taking the rectangle from *this.Otsu分割矩形，从*this取矩形。
 void ImageThresholder::OtsuThresholdRectToPix(Image src_pix, Image *out_pix) const {
   std::vector<int> thresholds;
   std::vector<int> hi_values;
 
   int num_channels = OtsuThreshold(src_pix, rect_left_, rect_top_, rect_width_, rect_height_,
                                    thresholds, hi_values);
-  // only use opencl if compiled w/ OpenCL and selected device is opencl
+  // only use opencl if compiled w/ OpenCL and selected device is opencl 只有当编译后的设备是opencl时才使用opencl
 #ifdef USE_OPENCL
   OpenclDevice od;
   if (num_channels == 4 && od.selectedDeviceIsOpenCL() && rect_top_ == 0 && rect_left_ == 0) {
@@ -297,7 +305,14 @@ void ImageThresholder::OtsuThresholdRectToPix(Image src_pix, Image *out_pix) con
 /// Threshold the rectangle, taking everything except the src_pix
 /// from the class, using thresholds/hi_values to the output pix.
 /// NOTE that num_channels is the size of the thresholds and hi_values
-// arrays and also the bytes per pixel in src_pix.
+/// 设置矩形的阈值，从类中获取除src_pix以外的所有内容，使用阈值/hi_values对输出pix进行设置。
+/// 说明num_channels是阈值和hi_values的大小
+/// src_pix:原图形
+/// num_channels：
+/// thresholds：图像分割阈值
+/// hi_values:
+/// pix:
+// arrays and also the bytes per pixel in src_pix.数组以及src_pix中每像素的字节数。
 void ImageThresholder::ThresholdRectToPix(Image src_pix, int num_channels, const std::vector<int> &thresholds,
                                           const std::vector<int> &hi_values, Image *pix) const {
   *pix = pixCreate(rect_width_, rect_height_, 1);

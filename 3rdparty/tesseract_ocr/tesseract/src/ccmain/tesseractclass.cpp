@@ -343,7 +343,8 @@ Tesseract::Tesseract()
     , BOOL_MEMBER(tessedit_create_boxfile, false, "Output text with boxes", this->params())
     , INT_MEMBER(tessedit_page_number, -1, "-1 -> All pages, else specific page to process",
                  this->params())
-    , BOOL_MEMBER(tessedit_write_images, false, "Capture the image from the IPE", this->params())
+  //    , BOOL_MEMBER(tessedit_write_images, false, "Capture the image from the IPE", this->params())
+      , BOOL_MEMBER(tessedit_write_images, true, "Capture the image from the IPE", this->params())
     , BOOL_MEMBER(interactive_display_mode, false, "Run interactively?", this->params())
     , STRING_MEMBER(file_type, ".tif", "Filename extension", this->params())
     , BOOL_MEMBER(tessedit_override_permuter, true, "According to dict_word", this->params())
@@ -507,10 +508,10 @@ void Tesseract::SetBlackAndWhitelist() {
 }
 
 // Perform steps to prepare underlying binary image/other data structures for
-// page segmentation.
+// page segmentation.执行步骤准备用于页面分割的底层二进制图像/其他数据结构。
 void Tesseract::PrepareForPageseg() {
   textord_.set_use_cjk_fp_model(textord_use_cjk_fp_model);
-  // Find the max splitter strategy over all langs.
+  // Find the max splitter strategy over all langs.找到所有langs的最大拆分策略。
   auto max_pageseg_strategy = static_cast<ShiroRekhaSplitter::SplitStrategy>(
       static_cast<int32_t>(pageseg_devanagari_split_strategy));
   for (auto &sub_lang : sub_langs_) {
@@ -523,7 +524,7 @@ void Tesseract::PrepareForPageseg() {
     sub_lang->pix_binary_ = pix_binary().clone();
   }
   // Perform shiro-rekha (top-line) splitting and replace the current image by
-  // the newly split image.
+  // the newly split image.执行shiro-rekha(顶部)分割，并用新分割的图像替换当前图像。
   splitter_.set_orig_pix(pix_binary());
   splitter_.set_pageseg_split_strategy(max_pageseg_strategy);
   if (splitter_.Split(true, &pixa_debug_)) {

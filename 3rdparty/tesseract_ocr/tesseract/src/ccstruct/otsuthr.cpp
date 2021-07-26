@@ -35,11 +35,18 @@ namespace tesseract {
 // that there is no apparent foreground. At least one hi_value will not be -1.
 // The return value is the number of channels in the input image, being
 // the size of the output thresholds and hi_values arrays.
+/**
+ * 计算给定图像矩形的Otsu阈值(s)，为每个通道创建一个。每个通道总是一个字节每像素。
+ * 返回一个阈值数组和一个hi_values数组，这样，如果hi_values[channel]为0，像素值>阈值[channel]被认为是前景，
+ * 如果hi_values[channel]为1，则被认为是背景。
+ * hi_value为-1表示没有明显的前台。至少有一个hi_value不为-1。
+ * 返回值是输入图像中的通道数，即输出阈值和hi_values数组的大小。
+ */
 int OtsuThreshold(Image src_pix, int left, int top, int width, int height, std::vector<int> &thresholds,
                   std::vector<int> &hi_values) {
   int num_channels = pixGetDepth(src_pix) / 8;
   // Of all channels with no good hi_value, keep the best so we can always
-  // produce at least one answer.
+  // produce at least one answer.在所有没有好的hi_value的通道中，保持最好的，这样我们总是能够产生至少一个答案。
   int best_hi_value = 1;
   int best_hi_index = 0;
   bool any_good_hivalue = false;
@@ -97,11 +104,11 @@ int OtsuThreshold(Image src_pix, int left, int top, int width, int height, std::
     for (int ch = 0; ch < num_channels; ++ch) {
       thresholds[ch] = -1;
       hi_values[ch] = -1;
-      // Compute the histogram of the image rectangle.
+      // Compute the histogram of the image rectangle.计算图像矩形的直方图。
       int histogram[kHistogramSize];
       HistogramRect(src_pix, ch, left, top, width, height, histogram);
-      int H;
-      int best_omega_0;
+      int H; //前景(即目标)和背景的分割阈值记
+      int best_omega_0; //前景的像素点数占整幅图像的比例记w1
       int best_t = OtsuStats(histogram, &H, &best_omega_0);
       if (best_omega_0 == 0 || best_omega_0 == H) {
         // This channel is empty.
@@ -110,6 +117,7 @@ int OtsuThreshold(Image src_pix, int left, int top, int width, int height, std::
       // To be a convincing foreground we must have a small fraction of H
       // or to be a convincing background we must have a large fraction of H.
       // In between we assume this channel contains no thresholding information.
+      //要生成一个可信度高的前景，必须小于H，要成为一个可信度高的背景，必须大于H。在这两者之间，我们假设这个通道不包含阈值信息。
       int hi_value = best_omega_0 < H * 0.5;
       thresholds[ch] = best_t;
       if (best_omega_0 > H * 0.75) {
@@ -143,6 +151,11 @@ int OtsuThreshold(Image src_pix, int left, int top, int width, int height, std::
 // single channel. Each channel is always one byte per pixel.
 // Histogram is always a kHistogramSize(256) element array to count
 // occurrences of each pixel value.
+/**
+ * 计算给定的图像矩形的直方图，以及给定的单个通道。
+ * 每个通道总是每像素一个字节。
+ * 直方图总是一个k直方图大小(256)元素数组，用来计数每个像素值的出现次数。
+ */
 void HistogramRect(Image src_pix, int channel, int left, int top, int width, int height,
                    int *histogram) {
   int num_channels = pixGetDepth(src_pix) / 8;
@@ -163,6 +176,9 @@ void HistogramRect(Image src_pix, int channel, int left, int top, int width, int
 // Computes the Otsu threshold(s) for the given histogram.
 // Also returns H = total count in histogram, and
 // omega0 = count of histogram below threshold.
+/**
+ *  计算给定直方图的Otsu阈值。 还返回H_out=直方图中的总计数，omega0_out =低于阈值的直方图计数。
+ */
 int OtsuStats(const int *histogram, int *H_out, int *omega0_out) {
   int H = 0;
   double mu_T = 0.0;
@@ -171,7 +187,7 @@ int OtsuStats(const int *histogram, int *H_out, int *omega0_out) {
     mu_T += static_cast<double>(i) * histogram[i];
   }
 
-  // Now maximize sig_sq_B over t.
+  // Now maximize sig_sq_B over t.最大化sig_sq_B / t。
   // http://www.ctie.monash.edu.au/hargreave/Cornall_Terry_328.pdf
   int best_t = -1;
   int omega_0, omega_1;

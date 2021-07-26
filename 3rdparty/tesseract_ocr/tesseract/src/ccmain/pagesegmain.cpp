@@ -97,6 +97,7 @@ static Image RemoveEnclosingCircle(Image pixs) {
  * Segment the page according to the current value of tessedit_pageseg_mode.
  * pix_binary_ is used as the source image and should not be nullptr.
  * On return the blocks list owns all the constructed page layout.
+ * 根据tessedit_pageseg_mode的当前值分段页面。Pix_binary_被用作源图像，不应该是nullptr。返回时块列表拥有所有已构建的页面布局。
  */
 int Tesseract::SegmentPage(const char *input_file, BLOCK_LIST *blocks, Tesseract *osd_tess,
                            OSResults *osr) {

@@ -145,7 +145,7 @@ struct TesseractStats {
   bool write_results_empty_block;
 };
 
-// Struct to hold all the pointers to relevant data for processing a word.
+// Struct to hold all the pointers to relevant data for processing a word.结构保存所有指向处理一个字的相关数据的指针。
 struct WordData {
   WordData() : word(nullptr), row(nullptr), block(nullptr), prev_word(nullptr) {}
   explicit WordData(const PAGE_RES_IT &page_res_it)
@@ -170,6 +170,13 @@ struct WordData {
 // may be the consumed in_word, or may be generated independently. This api
 // allows both a conventional tesseract classifier to work, or a line-level
 // classifier that generates multiple words from a merged input.
+/**
+ * 定义一个Tesseract单词识别器。
+ * WordData提供行/块的上下文中,
+ * in_word持有一个初始化,可能甚至单词,识别器的可能或不可能使用(但如果这集* in_word = nullptr),
+ * 并产生一个或多个输出out_words的话,这可能是in_word消费,或者可能生成的独立。
+ * 该api既允许传统tesseract分类器工作，也允许从合并的输入生成多个单词的行级分类器工作。
+ */
 using WordRecognizer = void (Tesseract::*)(const WordData &, WERD_RES **,
                                            PointerVector<WERD_RES> *);
 
@@ -197,6 +204,7 @@ public:
     return reskew_;
   }
   // Destroy any existing pix and return a pointer to the pointer.
+  //销毁任何现有的图形并返回指向该指针的指针。
   Image *mutable_pix_binary() {
     pix_binary_.destroy();
     return &pix_binary_;
@@ -282,7 +290,7 @@ public:
   Tesseract *get_sub_lang(int index) const {
     return sub_langs_[index];
   }
-  // Returns true if any language uses Tesseract (as opposed to LSTM).
+  // Returns true if any language uses Tesseract (as opposed to LSTM).如果任何语言使用Tesseract(相对于LSTM)，则返回true。
   bool AnyTessLang() const {
     if (tessedit_ocr_engine_mode != OEM_LSTM_ONLY) {
       return true;
@@ -294,7 +302,7 @@ public:
     }
     return false;
   }
-  // Returns true if any language uses the LSTM.
+  // Returns true if any language uses the LSTM.如果任何语言使用LSTM，则返回true。
   bool AnyLSTMLang() const {
     if (tessedit_ocr_engine_mode != OEM_TESSERACT_ONLY) {
       return true;
@@ -488,6 +496,9 @@ public:
   // string and recursively any additional languages required by any language
   // traineddata file (via tessedit_load_sublangs in its config) that is loaded.
   // See init_tesseract_internal for args.
+  // 初始化可能由语言字符串定义的一组语言，
+  // 并递归地初始化加载的任何语言训练数据文件(通过其配置中的tessedit_load_subblangs)所需的任何其他语言。
+  // args参见init_tesseract_internal。
   int init_tesseract(const std::string &arg0, const std::string &textbase,
                      const std::string &language, OcrEngineMode oem, char **configs,
                      int configs_size, const std::vector<std::string> *vars_vec,
@@ -748,13 +759,13 @@ public:
   float ComputeCompatibleXheight(WERD_RES *word_res, float *baseline_shift);
   //// Data members ///////////////////////////////////////////////////////
   // TODO(ocr-team): Find and remove obsolete parameters.
-  BOOL_VAR_H(tessedit_resegment_from_boxes, false, "Take segmentation and labeling from box file");
+  BOOL_VAR_H(tessedit_resegment_from_boxes, false, "Take segmentation and labeling from box file");//从框文件分段和标签
   BOOL_VAR_H(tessedit_resegment_from_line_boxes, false,
-             "Conversion of word/line box file to char box file");
+             "Conversion of word/line box file to char box file"); //转换 单词/行 框文件到字符框文件
   BOOL_VAR_H(tessedit_train_from_boxes, false, "Generate training data from boxed chars");
-  BOOL_VAR_H(tessedit_make_boxes_from_boxes, false, "Generate more boxes from boxed chars");
+  BOOL_VAR_H(tessedit_make_boxes_from_boxes, false, "Generate more boxes from boxed chars");//在已生成框的字符串中生成更多的框
   BOOL_VAR_H(tessedit_train_line_recognizer, false,
-             "Break input into lines and remap boxes if present");
+             "Break input into lines and remap boxes if present");//如果存在，将输入分隔成行并重新映射框
   BOOL_VAR_H(tessedit_dump_pageseg_images, false,
              "Dump intermediate images made during page segmentation");
   BOOL_VAR_H(tessedit_do_invert, true, "Try inverting the image in `LSTMRecognizeWord`");
@@ -772,6 +783,9 @@ public:
   INT_VAR_H(pageseg_devanagari_split_strategy, tesseract::ShiroRekhaSplitter::NO_SPLIT,
             "Whether to use the top-line splitting process for Devanagari "
             "documents while performing page-segmentation.");
+//  INT_VAR_H(pageseg_devanagari_split_strategy, tesseract::ShiroRekhaSplitter::MAXIMAL_SPLIT,
+//            "Whether to use the top-line splitting process for Devanagari "
+//            "documents while performing page-segmentation.");
   INT_VAR_H(ocr_devanagari_split_strategy, tesseract::ShiroRekhaSplitter::NO_SPLIT,
             "Whether to use the top-line splitting process for Devanagari "
             "documents while performing ocr.");
@@ -835,9 +849,9 @@ public:
   double_VAR_H(quality_outline_pc, 1.0, "good_quality_doc lte outline error limit");
   double_VAR_H(quality_char_pc, 0.95, "good_quality_doc gte good char limit");
   INT_VAR_H(quality_min_initial_alphas_reqd, 2, "alphas in a good word");
-  INT_VAR_H(tessedit_tess_adaption_mode, 0x27, "Adaptation decision algorithm for tess");
-  BOOL_VAR_H(tessedit_minimal_rej_pass1, false, "Do minimal rejection on pass 1 output");
-  BOOL_VAR_H(tessedit_test_adaption, false, "Test adaption criteria");
+  INT_VAR_H(tessedit_tess_adaption_mode, 0x27, "Adaptation decision algorithm for tess");//tess的自适应决策算法
+  BOOL_VAR_H(tessedit_minimal_rej_pass1, false, "Do minimal rejection on pass 1 output");//在通过1输出时是否有最小的拒绝
+  BOOL_VAR_H(tessedit_test_adaption, false, "Test adaption criteria");//适应测试标准
   BOOL_VAR_H(test_pt, false, "Test for point");
   double_VAR_H(test_pt_x, 99999.99, "xcoord");
   double_VAR_H(test_pt_y, 99999.99, "ycoord");
@@ -975,7 +989,8 @@ public:
   INT_VAR_H(min_sane_x_ht_pixels, 8, "Reject any x-ht lt or eq than this");
   BOOL_VAR_H(tessedit_create_boxfile, false, "Output text with boxes");
   INT_VAR_H(tessedit_page_number, -1, "-1 -> All pages, else specific page to process");
-  BOOL_VAR_H(tessedit_write_images, false, "Capture the image from the IPE");
+//  BOOL_VAR_H(tessedit_write_images, false, "Capture the image from the IPE");
+  BOOL_VAR_H(tessedit_write_images, true, "Capture the image from the IPE");
   BOOL_VAR_H(interactive_display_mode, false, "Run interactively?");
   STRING_VAR_H(file_type, ".tif", "Filename extension");
   BOOL_VAR_H(tessedit_override_permuter, true, "According to dict_word");
@@ -991,7 +1006,7 @@ public:
   BOOL_VAR_H(tessedit_init_config_only, false,
              "Only initialize with the config file. Useful if the instance is "
              "not going to be used for OCR but say only for layout analysis.");
-  BOOL_VAR_H(textord_equation_detect, false, "Turn on equation detector");
+  BOOL_VAR_H(textord_equation_detect, false, "Turn on equation detector");//接通方程检测器
   BOOL_VAR_H(textord_tabfind_vertical_text, true, "Enable vertical detection");
   BOOL_VAR_H(textord_tabfind_force_vertical_text, false, "Force using vertical text page mode");
   double_VAR_H(textord_tabfind_vertical_text_ratio, 0.5,
@@ -1032,11 +1047,18 @@ private:
   // The filename of a backup config file. If not null, then we currently
   // have a temporary debug config file loaded, and backup_config_file_
   // will be loaded, and set to null when debug is complete.
+  /**
+   * 备份配置文件的文件名。如果不为空，那么我们当前加载了一个临时的调试配置文件，
+   * 并且backup_config_file_将被加载，并在调试完成时设置为空。
+   */
   const char *backup_config_file_;
   // The filename of a config file to read when processing a debug word.
+  //当处理调试字时要读取的配置文件的文件名。
   std::string word_config_;
   // Image used for input to layout analysis and tesseract recognition.
   // May be modified by the ShiroRekhaSplitter to eliminate the top-line.
+  //图像用于输入布局分析和tesseract识别。
+  //可以通过ShiroRekhaSplitter进行修改以消除顶行。
   Image pix_binary_;
   // Grey-level input image if the input was not binary, otherwise nullptr.
   Image pix_grey_;
@@ -1050,9 +1072,10 @@ private:
   // transmitted by operations on Pix, so we keep an independent record here.
   int source_resolution_;
   // The shiro-rekha splitter object which is used to split top-lines in
-  // Devanagari words to provide a better word and grapheme segmentation.
+  // Devanagari words to provide a better word and grapheme segmentation.shiro-rekha
+  //分割器对象，用于分割Devanagari单词的顶行，以提供更好的单词和字素分割。
   ShiroRekhaSplitter splitter_;
-  // Page segmentation/layout
+  // Page segmentation/layout页面分割/布局
   Textord textord_;
   // True if the primary language uses right_to_left reading order.
   bool right_to_left_;
@@ -1061,7 +1084,7 @@ private:
   FCOORD deskew_;
   FCOORD reskew_;
   TesseractStats stats_;
-  // Sub-languages to be tried in addition to this.
+  // Sub-languages to be tried in addition to this.此外，还将尝试子语言。
   std::vector<Tesseract *> sub_langs_;
   // Most recently used Tesseract out of this and sub_langs_. The default
   // language for the next word.

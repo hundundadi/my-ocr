@@ -84,6 +84,7 @@ public:
   // Set the resolution of the source image in pixels per inch.
   // This should be called right after SetImage(), and will let us return
   // appropriate font sizes for the text.
+  //以每英寸像素为单位设置源图像的分辨率。 这应该在SetImage()之后调用，并让我们返回适当的文本字体大小。
   void SetSourceYResolution(int ppi) {
     yres_ = ppi;
     estimated_res_ = ppi;
@@ -176,9 +177,9 @@ protected:
   int pix_channels_; ///< Number of 8-bit channels in pix_.
   int pix_wpl_;      ///< Words per line of pix_.
   // Limits of image rectangle to be processed.
-  int scale_;         ///< Scale factor from original image.
-  int yres_;          ///< y pixels/inch in source image.
-  int estimated_res_; ///< Resolution estimate from text size.
+  int scale_;         ///< Scale factor from original image. 从原始图像的比例因子。
+  int yres_;          ///< y pixels/inch in source image. 源图像中的Y像素/英寸。
+  int estimated_res_; ///< Resolution estimate from text size.根据文本大小估计分辨率。
   int rect_left_;
   int rect_top_;
   int rect_width_;

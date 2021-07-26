@@ -1567,6 +1567,14 @@ void PAGE_RES_IT::ResetWordIterator() {
  *iterators for a new block. The iterator maintains pointers to block, row and
  *word for the previous, current and next words.  These are correct, regardless
  *of block/row boundaries. nullptr values denote start and end of the page.
+ * 找出这一页上的下一个单词。如果empty_ok为true，
+ * 则访问非文本块和没有文本的文本块，就像它们在单个虚构行中包含单个虚构单词一样。
+ * (word()和row()在这样的块中都返回nullptr，并且返回值是nullptr。)
+ * 如果empty_ok为false，则保持原来的行为。
+ * 访问每个真实的单词，跳过空的和非文本的块和行。
+ * New_block用于初始化新块的迭代器。
+ * 迭代器维护指向前一个、当前和下一个单词的块、行和单词的指针。
+ * 不管块/行边界是什么，这些都是正确的。Nullptr值表示页面的开始和结束。
  *************************************************************************/
 
 WERD_RES *PAGE_RES_IT::internal_forward(bool new_block, bool empty_ok) {

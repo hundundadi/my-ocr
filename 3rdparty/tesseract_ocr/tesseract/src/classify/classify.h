@@ -486,7 +486,7 @@ private:
 
   std::vector<uint16_t> shapetable_cutoffs_;
 
-  /* variables used to hold performance statistics */
+  /* variables used to hold performance statistics 用于保存性能统计数据的变量*/
   int NumAdaptationsFailed = 0;
 
   // Expected number of features in the class pruner, used to penalize

@@ -614,11 +614,17 @@ void TessBaseAPI::SetSourceResolution(int ppi) {
  * Pix vs raw, which to use?
  * Use Pix where possible. Tesseract uses Pix as its internal representation
  * and it is therefore more efficient to provide a Pix directly.
+ * 提供一个图像给Tesseract识别。和上面的SetImage一样，
+ * Tesseract采取自己的图像副本，所以它不需要持续直到
+ * 识别后。
+ * Pix vs raw，使用哪个?
+ * 尽可能使用图片。Tesseract使用Pix作为其内部表示
+ * 因此直接提供一个Pix是更有效的。
  */
 void TessBaseAPI::SetImage(Pix *pix) {
   if (InternalSetImage()) {
     if (pixGetSpp(pix) == 4 && pixGetInputFormat(pix) == IFF_PNG) {
-      // remove alpha channel from png
+      // remove alpha channel from png 从PNG中删除alpha通道
       Pix *p1 = pixRemoveAlpha(pix);
       pixSetSpp(p1, 3);
       (void)pixCopy(pix, p1);
@@ -848,6 +854,7 @@ PageIterator *TessBaseAPI::AnalyseLayout(bool merge_similar_words) {
 /**
  * Recognize the tesseract global image and return the result as Tesseract
  * internal structures.
+ * 识别tesseract全局图片，并将结果作为tesseract内部结构返回。
  */
 int TessBaseAPI::Recognize(ETEXT_DESC *monitor) {
   if (tesseract_ == nullptr) {
@@ -917,15 +924,16 @@ int TessBaseAPI::Recognize(ETEXT_DESC *monitor) {
     fclose(training_output_file);
 #endif // ndef DISABLED_LEGACY_ENGINE
   } else {
-    // Now run the main recognition.
+    // Now run the main recognition.现在运行主识别。
     bool wait_for_text = true;
     GetBoolVariable("paragraph_text_based", &wait_for_text);
     if (!wait_for_text) {
-      DetectParagraphs(false);
+      DetectParagraphs(false);      //检测段落
     }
+    //开始识别所有的文字
     if (tesseract_->recog_all_words(page_res_, monitor, nullptr, nullptr, 0)) {
       if (wait_for_text) {
-        DetectParagraphs(true);
+        DetectParagraphs(true);      //检测段落
       }
     } else {
       result = -1;
@@ -1349,7 +1357,9 @@ MutableIterator *TessBaseAPI::GetMutableIterator() {
                              rect_width_, rect_height_);
 }
 
-/** Make a text string from the internal data structures. */
+/** Make a text string from the internal data structures.
+  *从内部数据结构生成文本字符串
+  */
 char *TessBaseAPI::GetUTF8Text() {
   if (tesseract_ == nullptr || (!recognition_done_ && Recognize(nullptr) < 0)) {
     return nullptr;
@@ -2062,7 +2072,7 @@ void TessBaseAPI::SetProbabilityInContextFunc(ProbabilityInContextFunc f) {
   }
 }
 
-/** Common code for setting the image. */
+/** Common code for setting the image. 设置图像的常用代码。*/
 bool TessBaseAPI::InternalSetImage() {
   if (tesseract_ == nullptr) {
     tprintf("Please call Init before attempting to set an image.\n");
@@ -2080,6 +2090,8 @@ bool TessBaseAPI::InternalSetImage() {
  * which must not be nullptr. *pix must be initialized to nullptr, or point
  * to an existing pixDestroyable Pix.
  * The usual argument to Threshold is Tesseract::mutable_pix_binary().
+ * 运行阈值器来生成有阈值的图像，以像素形式返回，它一定不能为nullptr。*pix必须初始化为nullptr，
+ * 或者指向一个已经存在的pixDestroyable pix。Threshold的常用参数是Tesseract::mutable_pix_binary()。
  */
 bool TessBaseAPI::Threshold(Pix **pix) {
   ASSERT_HOST(pix != nullptr);
@@ -2087,6 +2099,7 @@ bool TessBaseAPI::Threshold(Pix **pix) {
     pixDestroy(pix);
   }
   // Zero resolution messes up the algorithms, so make sure it is credible.
+  //零分辨率会打乱算法，所以要确保它是可信的。
   int user_dpi = 0;
   GetIntVariable("user_defined_dpi", &user_dpi);
   int y_res = thresholder_->GetScaledYResolution();
@@ -2107,7 +2120,7 @@ bool TessBaseAPI::Threshold(Pix **pix) {
     }
     thresholder_->SetSourceYResolution(kMinCredibleResolution);
   }
-  auto pageseg_mode = static_cast<PageSegMode>(static_cast<int>(tesseract_->tessedit_pageseg_mode));
+  auto pageseg_mode = static_cast<PageSegMode>(static_cast<int>(tesseract_->tessedit_pageseg_mode));  //获取页面布局分析的可能模式
   Image im(*pix);
   if (!thresholder_->ThresholdToPix(pageseg_mode, &im)) {
     return false;
@@ -2126,6 +2139,7 @@ bool TessBaseAPI::Threshold(Pix **pix) {
   // estimated resolution, rather than the image resolution, which may be
   // fabricated, but we will use the image resolution, if there is one, to
   // report output point sizes.
+  //根据估计的分辨率设置用于布局参数的内部分辨率，而不是图像分辨率，这可能是伪造的，但如果有图像分辨率，我们将使用图像分辨率来报告输出点大小。
   int estimated_res = ClipToRange(thresholder_->GetScaledEstimatedResolution(),
                                   kMinCredibleResolution, kMaxCredibleResolution);
   if (estimated_res != thresholder_->GetScaledEstimatedResolution()) {
@@ -2138,7 +2152,9 @@ bool TessBaseAPI::Threshold(Pix **pix) {
   return true;
 }
 
-/** Find lines from the image making the BLOCK_LIST. */
+/** Find lines from the image making the BLOCK_LIST.
+ *  从生成BLOCK_LIST的图像中找到行
+ */
 int TessBaseAPI::FindLines() {
   if (thresholder_ == nullptr || thresholder_->IsEmpty()) {
     tprintf("Please call SetImage before attempting recognition.\n");
@@ -2156,10 +2172,11 @@ int TessBaseAPI::FindLines() {
     tesseract_->InitAdaptiveClassifier(nullptr);
 #endif
   }
+  //二值化处理
   if (tesseract_->pix_binary() == nullptr && !Threshold(&tesseract_->mutable_pix_binary()->pix_)) {
     return -1;
   }
-
+  //准备页面分割
   tesseract_->PrepareForPageseg();
 
 #ifndef DISABLED_LEGACY_ENGINE
@@ -2174,7 +2191,7 @@ int TessBaseAPI::FindLines() {
     }
   }
 #endif // ndef DISABLED_LEGACY_ENGINE
-
+  //方向和脚本检测
   Tesseract *osd_tess = osd_tesseract_;
   OSResults osr;
   if (PSM_OSD_ENABLED(tesseract_->tessedit_pageseg_mode) && osd_tess == nullptr) {
@@ -2208,7 +2225,7 @@ int TessBaseAPI::FindLines() {
   }
 
   // If Devanagari is being recognized, we use different images for page seg
-  // and for OCR.
+  // and for OCR.如果Devanagari被识别，我们将使用不同的图像用于页面隔离和OCR。
   tesseract_->PrepareForTessOCR(block_list_, osd_tess, &osr);
   return 0;
 }

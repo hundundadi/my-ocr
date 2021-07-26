@@ -36,6 +36,8 @@ INCLUDEPATH += \
     $$TESSERACT_SRCDIR/src/textord \
     $$TESSERACT_SRCDIR/src/viewer \
     $$TESSERACT_SRCDIR/src/wordrec \
+#    $$TESSERACT_SRCDIR/src/training \
+    /usr/include/c++/8 \
     /usr/include/leptonica
 HEADERS += $$TESSERACT_SRCDIR/include/tesseract/baseapi.h \
            $$TESSERACT_SRCDIR/include/tesseract/capi.h \
@@ -190,6 +192,7 @@ HEADERS += $$TESSERACT_SRCDIR/include/tesseract/baseapi.h \
           $$TESSERACT_SRCDIR/src/lstm/static_shape.h \
           $$TESSERACT_SRCDIR/src/lstm/stridemap.h \
           $$TESSERACT_SRCDIR/src/lstm/tfnetwork.h \
+#          $$TESSERACT_SRCDIR/src/lstm/tfnetwork.pb.h \
           $$TESSERACT_SRCDIR/src/lstm/weightmatrix.h \
           $$TESSERACT_SRCDIR/src/opencl/oclkernels.h \
           $$TESSERACT_SRCDIR/src/opencl/openclwrapper.h \
@@ -232,6 +235,8 @@ HEADERS += $$TESSERACT_SRCDIR/include/tesseract/baseapi.h \
           $$TESSERACT_SRCDIR/src/textord/underlin.h \
           $$TESSERACT_SRCDIR/src/textord/wordseg.h \
           $$TESSERACT_SRCDIR/src/textord/workingpartset.h \
+#          $$TESSERACT_SRCDIR/src/training/degradeimage.h \
+#          $$TESSERACT_SRCDIR/src/training/mergenf.h \
           $$TESSERACT_SRCDIR/src/viewer/scrollview.h \
           $$TESSERACT_SRCDIR/src/viewer/svmnode.h \
           $$TESSERACT_SRCDIR/src/viewer/svutil.h \
@@ -248,18 +253,37 @@ HEADERS += $$TESSERACT_SRCDIR/include/tesseract/baseapi.h \
           $$TESSERACT_SRCDIR/src/wordrec/plotedges.h \
           $$TESSERACT_SRCDIR/src/wordrec/render.h \
           $$TESSERACT_SRCDIR/src/wordrec/wordrec.h \
-
-ARCH = $$QMAKE_HOST.arch
-message("ARCH: " $$ARCH)
-
-isEqual(ARCH, aarch64) {
-    SOURCES +=  $$TESSERACT_SRCDIR/src/arch/dotproductavx.cpp \
-          $$TESSERACT_SRCDIR/src/arch/dotproductfma.cpp \
-          $$TESSERACT_SRCDIR/src/arch/dotproductsse.cpp \
-          $$TESSERACT_SRCDIR/src/arch/intsimdmatrixavx2.cpp \
-          $$TESSERACT_SRCDIR/src/arch/intsimdmatrixneon.cpp \
-          $$TESSERACT_SRCDIR/src/arch/intsimdmatrixsse.cpp \
-}
+#          $$TESSERACT_SRCDIR/src/training/common/commandlineflags.h \
+#          $$TESSERACT_SRCDIR/src/training/common/commontraining.h \
+#          $$TESSERACT_SRCDIR/src/training/common/ctc.h \
+#          $$TESSERACT_SRCDIR/src/training/common/errorcounter.h \
+#          $$TESSERACT_SRCDIR/src/training/common/export.h \
+#          $$TESSERACT_SRCDIR/src/training/common/intfeaturedist.h \
+#          $$TESSERACT_SRCDIR/src/training/common/intfeaturemap.h \
+#          $$TESSERACT_SRCDIR/src/training/common/mastertrainer.h \
+#          $$TESSERACT_SRCDIR/src/training/common/networkbuilder.h \
+#          $$TESSERACT_SRCDIR/src/training/common/sampleiterator.h \
+#          $$TESSERACT_SRCDIR/src/training/common/trainingsampleset.h \
+#          $$TESSERACT_SRCDIR/src/training/pango/boxchar.h \
+#          $$TESSERACT_SRCDIR/src/training/pango/export.h \
+#          $$TESSERACT_SRCDIR/src/training/pango/ligature_table.h \
+#          $$TESSERACT_SRCDIR/src/training/pango/pango_font_info.h \
+#          $$TESSERACT_SRCDIR/src/training/pango/stringrenderer.h \
+#          $$TESSERACT_SRCDIR/src/training/pango/tlog.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/export.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/fileio.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/icuerrorcode.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/lang_model_helpers.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/lstmtester.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/lstmtrainer.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/normstrngs.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/unicharset_training_utils.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_grapheme.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_indic.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_javanese.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_khmer.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_myanmar.h \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validator.h
 
 SOURCES += $$TESSERACT_SRCDIR/src/api/altorenderer.cpp \
           $$TESSERACT_SRCDIR/src/api/baseapi.cpp \
@@ -268,9 +292,16 @@ SOURCES += $$TESSERACT_SRCDIR/src/api/altorenderer.cpp \
           $$TESSERACT_SRCDIR/src/api/lstmboxrenderer.cpp \
           $$TESSERACT_SRCDIR/src/api/pdfrenderer.cpp \
           $$TESSERACT_SRCDIR/src/api/renderer.cpp \
+#          $$TESSERACT_SRCDIR/src/api/tesseractmain.cpp \
           $$TESSERACT_SRCDIR/src/api/wordstrboxrenderer.cpp \
           $$TESSERACT_SRCDIR/src/arch/dotproduct.cpp \
+#          $$TESSERACT_SRCDIR/src/arch/dotproductavx.cpp \
+#          $$TESSERACT_SRCDIR/src/arch/dotproductfma.cpp \
+#          $$TESSERACT_SRCDIR/src/arch/dotproductsse.cpp \
           $$TESSERACT_SRCDIR/src/arch/intsimdmatrix.cpp \
+#          $$TESSERACT_SRCDIR/src/arch/intsimdmatrixavx2.cpp \
+#          $$TESSERACT_SRCDIR/src/arch/intsimdmatrixneon.cpp \
+#          $$TESSERACT_SRCDIR/src/arch/intsimdmatrixsse.cpp \
           $$TESSERACT_SRCDIR/src/arch/simddetect.cpp \
           $$TESSERACT_SRCDIR/src/ccmain/adaptions.cpp \
           $$TESSERACT_SRCDIR/src/ccmain/applybox.cpp \
@@ -412,6 +443,7 @@ SOURCES += $$TESSERACT_SRCDIR/src/api/altorenderer.cpp \
           $$TESSERACT_SRCDIR/src/lstm/series.cpp \
           $$TESSERACT_SRCDIR/src/lstm/stridemap.cpp \
           $$TESSERACT_SRCDIR/src/lstm/tfnetwork.cpp \
+#          $$TESSERACT_SRCDIR/src/lstm/tfnetwork.pb.cc \
           $$TESSERACT_SRCDIR/src/lstm/weightmatrix.cpp \
           $$TESSERACT_SRCDIR/src/opencl/openclwrapper.cpp \
           $$TESSERACT_SRCDIR/src/textord/alignedblob.cpp \
@@ -454,8 +486,26 @@ SOURCES += $$TESSERACT_SRCDIR/src/api/altorenderer.cpp \
           $$TESSERACT_SRCDIR/src/textord/underlin.cpp \
           $$TESSERACT_SRCDIR/src/textord/wordseg.cpp \
           $$TESSERACT_SRCDIR/src/textord/workingpartset.cpp \
+#          $$TESSERACT_SRCDIR/src/training/ambiguous_words.cpp \
+#          $$TESSERACT_SRCDIR/src/training/classifier_tester.cpp \
+#          $$TESSERACT_SRCDIR/src/training/cntraining.cpp \
+#          $$TESSERACT_SRCDIR/src/training/combine_lang_model.cpp \
+#          $$TESSERACT_SRCDIR/src/training/combine_tessdata.cpp \
+#          $$TESSERACT_SRCDIR/src/training/dawg2wordlist.cpp \
+#          $$TESSERACT_SRCDIR/src/training/degradeimage.cpp \
+#          $$TESSERACT_SRCDIR/src/training/lstmeval.cpp \
+#          $$TESSERACT_SRCDIR/src/training/lstmtraining.cpp \
+#          $$TESSERACT_SRCDIR/src/training/merge_unicharsets.cpp \
+#          $$TESSERACT_SRCDIR/src/training/mergenf.cpp \
+#          $$TESSERACT_SRCDIR/src/training/mftraining.cpp \
+#          $$TESSERACT_SRCDIR/src/training/set_unicharset_properties.cpp \
+#          $$TESSERACT_SRCDIR/src/training/shapeclustering.cpp \
+#          $$TESSERACT_SRCDIR/src/training/text2image.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset_extractor.cpp \
+#          $$TESSERACT_SRCDIR/src/training/wordlist2dawg.cpp \
           $$TESSERACT_SRCDIR/src/viewer/scrollview.cpp \
           $$TESSERACT_SRCDIR/src/viewer/svmnode.cpp \
+#          $$TESSERACT_SRCDIR/src/viewer/svpaint.cpp \
           $$TESSERACT_SRCDIR/src/viewer/svutil.cpp \
           $$TESSERACT_SRCDIR/src/wordrec/associate.cpp \
           $$TESSERACT_SRCDIR/src/wordrec/chop.cpp \
@@ -476,6 +526,34 @@ SOURCES += $$TESSERACT_SRCDIR/src/api/altorenderer.cpp \
           $$TESSERACT_SRCDIR/src/wordrec/tface.cpp \
           $$TESSERACT_SRCDIR/src/wordrec/wordclass.cpp \
           $$TESSERACT_SRCDIR/src/wordrec/wordrec.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/commandlineflags.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/commontraining.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/ctc.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/errorcounter.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/intfeaturedist.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/intfeaturemap.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/mastertrainer.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/networkbuilder.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/sampleiterator.cpp \
+#          $$TESSERACT_SRCDIR/src/training/common/trainingsampleset.cpp \
+#          $$TESSERACT_SRCDIR/src/training/pango/boxchar.cpp \
+#          $$TESSERACT_SRCDIR/src/training/pango/ligature_table.cpp \
+#          $$TESSERACT_SRCDIR/src/training/pango/pango_font_info.cpp \
+#          $$TESSERACT_SRCDIR/src/training/pango/stringrenderer.cpp \
+#          $$TESSERACT_SRCDIR/src/training/pango/tlog.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/fileio.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/icuerrorcode.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/lang_model_helpers.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/lstmtester.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/lstmtrainer.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/normstrngs.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/unicharset_training_utils.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_grapheme.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_indic.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_javanese.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_khmer.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validate_myanmar.cpp \
+#          $$TESSERACT_SRCDIR/src/training/unicharset/validator.cpp
 
 message("-----------------end------------- ")
 

@@ -104,7 +104,7 @@ inline int RoundUp(int n, int block_size) {
   return block_size * ((n + block_size - 1) / block_size);
 }
 
-// Clip a numeric value to the interval [lower_bound, upper_bound].
+// Clip a numeric value to the interval [lower_bound, upper_bound].将数值剪辑到间隔[lower_bound, upper_bound]。
 template <typename T>
 inline T ClipToRange(const T &x, const T &lower_bound, const T &upper_bound) {
   if (x < lower_bound) {

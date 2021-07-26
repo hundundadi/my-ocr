@@ -78,6 +78,12 @@ void ShiroRekhaSplitter::set_orig_pix(Image pix) {
 // split_for_pageseg should be true if the splitting is being done prior to
 // page segmentation. This mode uses the flag
 // pageseg_devanagari_split_strategy to determine the splitting strategy.
+/**
+ * 基于当前设置执行分割的顶级方法。
+ * 如果实际执行了分割，则返回true。
+ * 如果拆分是在之前完成的，Split_for_pageseg应该为true
+ * 页面分割。这种模式使用pageseg_devanagari_split_strategy标志来确定拆分策略。
+ */
 bool ShiroRekhaSplitter::Split(bool split_for_pageseg, DebugPixa *pixa_debug) {
   SplitStrategy split_strategy = split_for_pageseg ? pageseg_split_strategy_ : ocr_split_strategy_;
   if (split_strategy == NO_SPLIT) {

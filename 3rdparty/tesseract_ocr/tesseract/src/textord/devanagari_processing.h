@@ -72,8 +72,8 @@ class ShiroRekhaSplitter {
 public:
   enum SplitStrategy {
     NO_SPLIT = 0,  // No splitting is performed for the phase.
-    MINIMAL_SPLIT, // Blobs are split minimally.
-    MAXIMAL_SPLIT  // Blobs are split maximally.
+    MINIMAL_SPLIT, // Blobs are split minimally.最小限度地分割斑点。
+    MAXIMAL_SPLIT  // Blobs are split maximally.斑点被最大程度地分割。
   };
 
   ShiroRekhaSplitter();

@@ -343,6 +343,8 @@ ParamsVectors *GlobalParams();
  * The values of the parameters defined with *_INIT_* macros are guaranteed
  * to be loaded from config files before Tesseract initialization is done
  * (there is no such guarantee for parameters defined with the other macros).
+ * 注意定义参数。
+ *_INIT_*宏定义的参数值保证在Tesseract初始化之前从配置文件加载(其他宏定义的参数没有这样的保证)。
  *************************************************************************/
 
 #define INT_VAR_H(name, val, comment) ::tesseract::IntParam name

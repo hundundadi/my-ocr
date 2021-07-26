@@ -159,7 +159,7 @@ public:
 enum CRUNCH_MODE { CR_NONE, CR_KEEP_SPACE, CR_LOOSE_SPACE, CR_DELETE };
 
 // WERD_RES is a collection of publicly accessible members that gathers
-// information about a word result.
+// information about a word result.WERD_RES是一个公开可访问成员的集合，用于收集关于单词结果的信息。
 class TESS_API WERD_RES : public ELIST_LINK {
 public:
   // Which word is which?
